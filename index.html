@@ -4,250 +4,264 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>好幣</title>
-<meta name="description" content="三個人一起買的好幣，各自還剩多少。">
-<meta name="theme-color" content="#F3F0EB" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#151311" media="(prefers-color-scheme: dark)">
+<meta name="description" content="三個人一起買的運動點數，各自還剩多少。">
+<meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e11" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="好幣">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&display=swap">
 <style>
 :root{
-  --bg:#f3f0eb; --card:#fefcfa; --card2:#eae4dc; --line:#e2dbd1;
-  --tx:#231f1a; --tx2:#6f655a; --tx3:#9a9086;
-  --warn:#b4532a;
-  --c1:#c2606f; --c2:#37806a; --c3:#a87a28; --c4:#7a5aa8; --c5:#3d7595; --c6:#96603c;
-  --round:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Varela Round","Avenir Next Rounded","Avenir Next",system-ui,sans-serif;
-  --ui:"PingFang TC",-apple-system,"Avenir Next","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
-  --r:18px;
+  /* 中性色統一走暖灰，不混冷灰 */
+  --bg:#faf9f7; --surface:#ffffff; --track:#ece9e4; --line:#e6e2dc;
+  --tx:#171614; --tx2:#6b665f; --tx3:#9c968d;
+  --c1:#f5155f; --c2:#00a578; --c3:#d97400; --c4:#7b3fe4; --c5:#0a7ea4; --c6:#c2185b;
+  --grain:.03;
+
+  --z-grain:1; --z-nav:10;
+  --fx:cubic-bezier(.16,1,.3,1);
+
+  --num:"Geist",ui-rounded,"SF Pro Rounded","Avenir Next",system-ui,sans-serif;
+  --ui:"Geist","PingFang TC",-apple-system,"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#151311; --card:#201d19; --card2:#2c2822; --line:#332e28;
-    --tx:#f3eee8; --tx2:#a79c90; --tx3:#776d63;
-    --warn:#e58a5f;
-    --c1:#e9a2ac; --c2:#8fc7b6; --c3:#e7c37e; --c4:#bda3e0; --c5:#8cb8d4; --c6:#d0a184;
+    --bg:#0e0e11; --surface:#18181c; --track:#26262c; --line:#26262c;
+    --tx:#f4f3f1; --tx2:#a5a19b; --tx3:#6f6b65;
+    --c1:#ff6b95; --c2:#2be3ac; --c3:#ffb13d; --c4:#b18aff; --c5:#5cc8ea; --c6:#ff8fb0;
+    --grain:.045;
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
+html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:var(--bg);color:var(--tx);
-  font-family:var(--ui);font-size:15px;line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-  overscroll-behavior-y:none;
+  margin:0;min-height:100dvh;background:var(--bg);color:var(--tx);
+  font-family:var(--ui);font-size:15px;line-height:1.5;font-weight:400;
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:none;
 }
-.n{font-family:var(--round);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+/* 一層很淡的顆粒，避免大色塊之間看起來太塑膠 */
+body::after{
+  content:"";position:fixed;inset:0;z-index:var(--z-grain);pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.n{font-family:var(--num);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:-.035em}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.14em;color:var(--tx3);line-height:1}
 
-.app{
-  max-width:520px;margin:0 auto;min-height:100%;
-  display:flex;flex-direction:column;
-  padding-top:env(safe-area-inset-top);
-}
+.wrap{max-width:520px;margin:0 auto;padding-top:env(safe-area-inset-top)}
 
-/* ---- header ---- */
-header{
-  padding:22px 20px 14px;
-  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
-}
-header h1{
-  margin:0;font-family:var(--round);font-size:26px;font-weight:700;letter-spacing:.02em;
-}
-header .sub{margin:3px 0 0;font-size:13px;color:var(--tx2)}
-header .sub b{font-family:var(--round);font-variant-numeric:tabular-nums;font-weight:600;color:var(--tx)}
-.pill{
-  flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:1px;
-  padding:8px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);
-}
-.pill b{font-family:var(--round);font-size:19px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.pill span{font-size:10px;color:var(--tx3);letter-spacing:.08em}
+/* ── header ───────────────────────────────── */
+.top{padding:var(--s6) var(--s5) var(--s4)}
+.top h1{margin:0 0 var(--s5);font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--tx2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+.kpi{display:flex;flex-direction:column;justify-content:flex-end;gap:7px}
+.kpi b{display:flex;align-items:flex-end;height:34px;font-family:var(--num);font-size:38px;font-weight:800;line-height:.8;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.kpi:nth-child(2),.kpi:nth-child(3){color:var(--tx2)}
+.kpi:nth-child(2) b,.kpi:nth-child(3) b{font-size:26px;color:var(--tx2)}
 
-/* ---- views ---- */
-main{flex:1;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
-section{display:none;flex-direction:column;gap:12px}
-section.on{display:flex;animation:in .32s cubic-bezier(.16,1,.3,1)}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+main{padding:var(--s5) var(--s5) calc(104px + env(safe-area-inset-bottom))}
+section{display:none}
+section[data-on]{display:block;animation:rise .34s var(--fx)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ---- balance cards ---- */
-.card{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
-  padding:16px 18px;
-  animation:in .45s cubic-bezier(.16,1,.3,1) backwards;
-  animation-delay:calc(var(--i)*60ms);
+/* ── 額度 ─────────────────────────────────── */
+.people{display:flex;flex-direction:column;gap:var(--s5)}
+.person{
+  border:0;padding:var(--s5) 0 0;border-top:1px solid var(--line);
+  animation:rise .5s var(--fx) backwards;animation-delay:calc(var(--i)*70ms);
 }
-.crow{display:flex;align-items:flex-start;gap:14px}
-.big{font-family:var(--round);font-size:44px;font-weight:700;line-height:.92;font-variant-numeric:tabular-nums;min-width:64px}
-.big em{font-style:normal;font-size:14px;font-weight:600;margin-left:3px;opacity:.5}
-.cwho{flex:1;min-width:0;padding-top:3px}
-.cname{display:flex;align-items:center;gap:7px;font-size:17px;font-weight:600}
-.dot{width:9px;height:9px;border-radius:50%;flex:none}
-.csub{font-size:13px;color:var(--tx2);margin-top:2px}
-.csub.low{color:var(--warn)}
-.bar{margin-top:14px;height:9px;border-radius:5px;background:var(--card2);overflow:hidden}
-.bar i{display:block;height:100%;border-radius:5px;transform-origin:left;animation:fill .8s cubic-bezier(.16,1,.3,1) backwards;animation-delay:calc(var(--i)*60ms + 120ms)}
-@keyframes fill{from{transform:scaleX(0)}to{transform:none}}
-.blabel{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--tx3)}
-.blabel span{font-family:var(--round);font-variant-numeric:tabular-nums}
+.person:first-child{border-top:0;padding-top:0}
+.phead{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)}
+.tag{width:8px;height:8px;border-radius:50%;flex:none;background:var(--k)}
+.pname{font-size:15px;font-weight:600;letter-spacing:.02em}
+.pused{margin-left:auto;font-family:var(--num);font-variant-numeric:tabular-nums;font-size:12px;color:var(--tx3);font-weight:500}
 
-.total{
-  display:flex;align-items:center;gap:14px;
-  padding:14px 18px;border-radius:var(--r);background:var(--card2);
+.pmain{display:flex;align-items:flex-end;gap:var(--s5)}
+.pleft{display:flex;flex-direction:column;gap:7px;flex:none}
+.pleft b{font-family:var(--num);font-size:60px;font-weight:800;line-height:.8;letter-spacing:-.05em;color:var(--k);font-variant-numeric:tabular-nums}
+.pright{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.pips{display:flex;gap:3px;height:26px}
+.pips i{
+  flex:1;border-radius:2px;background:var(--track);
+  animation:pop .5s var(--fx) backwards;animation-delay:calc(var(--i)*70ms + var(--j)*26ms);
 }
-.total .big{font-size:32px;min-width:auto}
-.total .tl{font-size:13px;color:var(--tx2);flex:1}
-.stack{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;flex:1;max-width:160px}
-.stack i{display:block}
+.pips i[data-f]{background:var(--k)}
+@keyframes pop{from{transform:scaleY(.2);opacity:0}to{transform:none;opacity:1}}
+.pfoot{display:flex;justify-content:space-between;align-items:flex-end;line-height:1}
+.pfoot b{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:13px;font-weight:600}
+.low b{color:var(--c1)}
 
-/* ---- classes ---- */
-.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.split{display:flex;height:6px;border-radius:3px;overflow:hidden;gap:2px;margin-bottom:var(--s6)}
+.split i{display:block;animation:wide .7s var(--fx) backwards}
+@keyframes wide{from{transform:scaleX(0)}to{transform:none}}
+
+/* ── 課程 ─────────────────────────────────── */
+.chips{display:flex;gap:var(--s2);overflow-x:auto;margin:0 calc(-1*var(--s5)) var(--s5);padding:0 var(--s5) var(--s1);scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{
-  flex:none;display:flex;align-items:center;gap:6px;
-  padding:7px 14px;border-radius:999px;border:1px solid var(--line);
-  background:var(--card);color:var(--tx2);font-size:13px;font-family:var(--ui);
-  cursor:pointer;transition:background .18s,color .18s,border-color .18s;
+  flex:none;display:flex;align-items:center;gap:6px;padding:8px 15px;
+  border-radius:999px;border:1px solid var(--line);background:transparent;
+  color:var(--tx2);font:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  transition:background .22s var(--fx),color .22s var(--fx),border-color .22s var(--fx),transform .12s var(--fx);
 }
-.chip[aria-pressed="true"]{background:var(--tx);color:var(--bg);border-color:var(--tx)}
-.chip[aria-pressed="true"] .dot{box-shadow:0 0 0 1.5px var(--bg)}
+.chip:hover{border-color:var(--tx3)}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed=true]{background:var(--tx);border-color:var(--tx);color:var(--bg)}
 
-.gtitle{font-size:11px;letter-spacing:.12em;color:var(--tx3);margin:14px 2px 2px;font-family:var(--round);font-weight:600}
-.item{
-  display:flex;align-items:center;gap:14px;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;
-}
-.item.next{border-color:color-mix(in oklab,var(--tx) 22%,var(--line))}
-.date{flex:none;width:44px;text-align:center;font-family:var(--round);font-variant-numeric:tabular-nums}
-.date b{display:block;font-size:19px;font-weight:700;line-height:1.05}
-.date span{display:block;font-size:10px;color:var(--tx3);letter-spacing:.04em}
-.info{flex:1;min-width:0}
-.info b{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.info span{font-size:12px;color:var(--tx3);font-family:var(--round);font-variant-numeric:tabular-nums}
-.dots{flex:none;display:flex;gap:5px}
-.strike b{text-decoration:line-through;opacity:.45}
+.glabel{margin:var(--s6) 0 var(--s3);display:flex;align-items:center;gap:var(--s3)}
+.glabel::after{content:"";flex:1;height:1px;background:var(--line)}
+.glabel:first-of-type{margin-top:0}
+.list{display:flex;flex-direction:column}
+.ev{display:flex;align-items:center;gap:var(--s4);padding:var(--s3) 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border-bottom:0}
+.evd{flex:none;width:46px}
+.evd b{display:block;font-family:var(--num);font-size:17px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.evd span{display:block;font-size:10px;color:var(--tx3);letter-spacing:.06em}
+.evi{flex:1;min-width:0}
+.evi b{display:block;font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evi span{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:12px;color:var(--tx3)}
+.evw{flex:none;display:flex;gap:5px}
+.evw i{width:8px;height:8px;border-radius:50%;display:block}
+.off b{color:var(--tx3);text-decoration:line-through}
 
-.empty{padding:44px 20px;text-align:center;color:var(--tx3);font-size:14px}
-
-/* ---- data view ---- */
-.field{display:flex;flex-direction:column;gap:7px}
-.field label{font-size:12px;color:var(--tx2);padding-left:2px}
+/* ── 資料 ─────────────────────────────────── */
+.sync{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:13px;color:var(--tx2)}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--c2);flex:none}
+.sync[data-warn] i{background:var(--c3)}
+.stack{display:flex;flex-direction:column;gap:var(--s4)}
 textarea{
-  width:100%;min-height:200px;resize:vertical;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;
-  color:var(--tx);font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;
-  padding:14px;white-space:pre;
+  width:100%;min-height:210px;resize:vertical;padding:14px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--tx);
+  font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;white-space:pre;
+  transition:border-color .2s var(--fx);
 }
-textarea:focus{outline:2px solid var(--tx2);outline-offset:-1px}
-.btns{display:flex;gap:10px}
-button.act{
-  flex:1;padding:14px;border-radius:14px;border:none;cursor:pointer;
-  font-family:var(--ui);font-size:15px;font-weight:600;
-  background:var(--tx);color:var(--bg);
-  transition:opacity .18s;
+textarea:hover{border-color:var(--tx3)}
+textarea:focus{outline:2px solid var(--tx);outline-offset:-1px;border-color:transparent}
+.row{display:flex;gap:10px}
+.btn{
+  flex:1;padding:14px;border-radius:12px;border:1px solid transparent;cursor:pointer;
+  font:inherit;font-size:15px;font-weight:600;background:var(--tx);color:var(--bg);
+  transition:transform .12s var(--fx),opacity .2s var(--fx);
 }
-button.act.ghost{background:var(--card);color:var(--tx2);border:1px solid var(--line)}
-button.act:active{opacity:.6}
-.status{
-  display:flex;align-items:center;gap:9px;padding:13px 16px;
-  background:var(--card2);border-radius:14px;font-size:13px;color:var(--tx2);
-}
-.status .dot{background:var(--c2)}
-.status.warn .dot{background:var(--warn)}
-.mini{font-size:12px;color:var(--tx3);padding:0 2px;line-height:1.7}
+.btn:hover{opacity:.85}
+.btn:active{transform:scale(.97)}
+.btn.sub{background:transparent;color:var(--tx2);border-color:var(--line)}
+.btn.sub:hover{border-color:var(--tx3);opacity:1}
+.facts{display:flex;gap:var(--s5);padding:0 2px}
+.fact{display:flex;flex-direction:column;gap:5px}
+.fact b{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:19px;font-weight:600;line-height:1}
 
-/* ---- tabbar ---- */
+.blank{padding:var(--s7) 0;display:flex;flex-direction:column;align-items:flex-start;gap:var(--s4)}
+.blank p{margin:0;color:var(--tx2);font-size:14px;max-width:32ch}
+.blank b{font-size:19px;font-weight:600;color:var(--tx)}
+.skel{display:flex;flex-direction:column;gap:var(--s5)}
+.skel div{height:96px;border-radius:12px;background:var(--track);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:.9}}
+
+/* ── tabbar ───────────────────────────────── */
 nav{
-  position:fixed;left:0;right:0;bottom:0;z-index:5;
-  display:flex;justify-content:center;
-  padding-bottom:env(safe-area-inset-bottom);
-  background:color-mix(in oklab,var(--bg) 86%,transparent);
-  backdrop-filter:saturate(150%) blur(14px);
-  -webkit-backdrop-filter:saturate(150%) blur(14px);
+  position:fixed;left:0;right:0;bottom:0;z-index:var(--z-nav);
+  display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);
+  background:color-mix(in oklab,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
   border-top:1px solid var(--line);
 }
-nav .inner{display:flex;width:100%;max-width:520px}
+nav ul{display:flex;width:100%;max-width:520px;margin:0;padding:0;list-style:none}
+nav li{flex:1}
 nav button{
-  flex:1;background:none;border:none;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:9px 0 11px;color:var(--tx3);font-family:var(--ui);font-size:10.5px;letter-spacing:.06em;
-  transition:color .2s;
+  width:100%;background:none;border:0;cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 13px;
+  color:var(--tx3);font-size:10px;font-weight:600;letter-spacing:.1em;
+  transition:color .22s var(--fx),transform .12s var(--fx);
 }
-nav button[aria-selected="true"]{color:var(--tx)}
-nav svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+nav button:hover{color:var(--tx2)}
+nav button:active{transform:scale(.94)}
+nav button[aria-selected=true]{color:var(--tx)}
+nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
+:focus-visible{outline:2px solid var(--tx);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:var(--s5);top:var(--s3);z-index:20;padding:10px 16px;background:var(--tx);color:var(--bg);border-radius:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div>
-      <h1>好幣</h1>
-      <p class="sub" id="sub">—</p>
+<a class="skip" href="#view">跳到內容</a>
+<div class="wrap">
+
+  <header class="top">
+    <h1>好幣</h1>
+    <div class="kpis">
+      <div class="kpi"><b class="n" id="k-left">—</b><span class="lbl">剩餘點數</span></div>
+      <div class="kpi"><b class="n" id="k-class">—</b><span class="lbl">可上堂數</span></div>
+      <div class="kpi"><b class="n" id="k-days">—</b><span class="lbl">效期剩餘</span></div>
     </div>
-    <div class="pill"><b class="n" id="days">—</b><span id="dayslabel">剩餘天數</span></div>
   </header>
 
-  <main>
-    <section id="v-balance" class="on"></section>
+  <main id="view">
+    <section id="v-balance" data-on></section>
     <section id="v-classes"></section>
     <section id="v-data">
-      <div class="status" id="status"><span class="dot"></span><span id="status-t">讀取中…</span></div>
-      <div class="field">
-        <label>從網站的 Details 表格整段複製，貼在這裡</label>
-        <textarea id="raw" spellcheck="false" placeholder="2026-08-13 18:12:30&#9;預約課程: …&#9;-4 Point&#9;誰"></textarea>
+      <div class="stack">
+        <div class="sync" id="sync"><i></i><span id="sync-t">讀取中</span></div>
+        <textarea id="raw" spellcheck="false" aria-label="貼上紀錄" placeholder="貼上 Details 表格"></textarea>
+        <div class="row">
+          <button class="btn" id="save">更新</button>
+          <button class="btn sub" id="reset">還原同步</button>
+        </div>
+        <div class="facts" id="facts"></div>
       </div>
-      <div class="btns">
-        <button class="act" id="save">更新</button>
-        <button class="act ghost" id="reset">回到同步資料</button>
-      </div>
-      <p class="mini" id="meta"></p>
     </section>
   </main>
 
   <nav>
-    <div class="inner">
-      <button data-v="balance" aria-selected="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/></svg>額度
-      </button>
-      <button data-v="classes" aria-selected="false">
-        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>課程
-      </button>
-      <button data-v="data" aria-selected="false">
-        <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4.5L3.5 9"/><path d="M4 13a8 8 0 0 0 14 4.5L20.5 15"/><path d="M3.5 4.5V9H8M20.5 19.5V15H16"/></svg>資料
-      </button>
-    </div>
+    <ul>
+      <li><button data-v="balance" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>額度</button></li>
+      <li><button data-v="classes" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 9.6h17M8 3.2v3.6M16 3.2v3.6"/></svg>課程</button></li>
+      <li><button data-v="data" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.6L3.6 9"/><path d="M4 13a8 8 0 0 0 14 4.6L20.4 15"/><path d="M3.6 4.6V9H8M20.4 19.4V15H16"/></svg>資料</button></li>
+    </ul>
   </nav>
+
 </div>
 
 <script>
 (function(){
 "use strict";
 
-var COLORS = ["--c1","--c2","--c3","--c4","--c5","--c6"];
+var KEYS = ["--c1","--c2","--c3","--c4","--c5","--c6"];
 var WEEK = ["日","一","二","三","四","五","六"];
+var UNIT = 4;                       // 一堂課的標準點數
 var K_RAW = "haocoin.raw", K_TAB = "haocoin.tab";
 var $ = function(id){ return document.getElementById(id); };
 var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); };
+var trim = function(v){ return (Math.round(v*10)/10).toString().replace(/\.0$/,""); };
 
-/* ---------- parse ---------- */
+/* ── 解析 ─────────────────────────────────── */
 
 function parse(text){
   var txs = [], expiry = null, expStamp = "";
-  var lines = text.split(/\r?\n/);
-  for (var i=0;i<lines.length;i++){
-    var line = lines[i].replace(/ /g," ").trim();
-    if (!line) continue;
+  text.split(/\r?\n/).forEach(function(raw){
+    var line = raw.replace(/ /g," ").trim();
+    if (!line) return;
     var m = line.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})\s*([\s\S]*)$/);
-    if (!m) continue;
+    if (!m) return;
     var stamp = m[1]+" "+m[2], rest = m[3];
 
     var ex = rest.match(/(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})/);
-    if (ex && !/預約課程|取消課程/.test(rest) && stamp > expStamp){ expiry = ex[2]; expStamp = stamp; }
+    if (ex && !/課程/.test(rest) && stamp > expStamp){ expiry = ex[2]; expStamp = stamp; }
 
     var pm = rest.match(/([+\-−–]\s?\d+)\s*Point/i);
-    if (!pm) continue;
+    if (!pm) return;
     var at = rest.indexOf(pm[0]);
     txs.push({
       stamp: stamp,
@@ -255,281 +269,267 @@ function parse(text){
       user: rest.slice(at+pm[0].length).trim(),
       change: parseInt(pm[1].replace(/[−–]/g,"-").replace(/\s/g,""),10)
     });
-  }
+  });
   return { txs: txs, expiry: expiry };
 }
 
 function detail(reason){
   var when = reason.match(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/) || [];
-  var title = ((reason.match(/】\s*([^（(]+)[（(]/)||[])[1]||"").trim();
-  var kind = /遲退取消/.test(reason) ? "lateCancel"
-           : /取消課程/.test(reason) ? "cancel"
-           : /預約課程/.test(reason) ? "book"
-           : /購買/.test(reason) ? "buy"
-           : /場館給予|贈點|贈送/.test(reason) ? "gift" : "other";
   return {
     id: (reason.match(/<([0-9a-zA-Z]+)>/)||[])[1] || null,
     date: when[1] || null,
     time: when[2] || null,
-    title: title,
-    kind: kind
+    title: ((reason.match(/】\s*([^（(]+)[（(]/)||[])[1]||"").trim(),
+    kind: /遲退取消/.test(reason) ? "lateCancel"
+        : /取消課程/.test(reason) ? "cancel"
+        : /預約課程/.test(reason) ? "book"
+        : /購買/.test(reason)     ? "buy"
+        : /場館給予|贈點|贈送/.test(reason) ? "gift" : "other"
   };
 }
 
 function build(text){
-  var p = parse(text), txs = p.txs;
-  var people = new Map(), slots = new Map(), pool = 0;
+  var p = parse(text), people = new Map(), slots = new Map(), pool = 0;
 
-  txs.forEach(function(tx){
+  p.txs.forEach(function(tx){
     var d = detail(tx.reason);
-    if (!tx.user){ if (tx.change>0) pool += tx.change; return; }
+    if (!tx.user){ if (tx.change > 0) pool += tx.change; return; }
 
-    if (!people.has(tx.user)) people.set(tx.user,{
-      name:tx.user, spent:0, refunded:0, books:0, cancels:0, wasted:0, attended:0
-    });
+    if (!people.has(tx.user))
+      people.set(tx.user, { name:tx.user, spent:0, refunded:0, books:0, cancels:0, wasted:0, attended:0 });
     var per = people.get(tx.user);
-    if (tx.change<0) per.spent += -tx.change; else per.refunded += tx.change;
+    if (tx.change < 0) per.spent += -tx.change; else per.refunded += tx.change;
 
-    if (d.kind==="book"||d.kind==="cancel"||d.kind==="lateCancel"){
-      var key = d.id || (tx.user+"|"+d.date+d.time);
+    if (d.kind === "book" || d.kind === "cancel" || d.kind === "lateCancel"){
+      var key = d.id || (tx.user + "|" + d.date + d.time);
       var s = slots.get(key);
       if (!s){
-        s = { user:tx.user, title:"", date:d.date, time:d.time, booked:0, refunded:0, cancelled:false, late:false };
-        slots.set(key,s);
+        s = { user:tx.user, title:"", date:d.date, time:d.time, booked:0, refunded:0, cancelled:false };
+        slots.set(key, s);
       }
-      if (!s.date && d.date){ s.date=d.date; s.time=d.time; }
+      if (!s.date && d.date){ s.date = d.date; s.time = d.time; }
       if (!s.title && d.title) s.title = d.title;
-      if (d.kind==="book"){ s.booked += -tx.change; per.books++; }
-      else {
-        s.refunded += tx.change; s.cancelled = true;
-        per.cancels++;
-        if (d.kind==="lateCancel") s.late = true;
-      }
+      if (d.kind === "book"){ s.booked += -tx.change; per.books++; }
+      else { s.refunded += tx.change; s.cancelled = true; per.cancels++; }
     }
   });
 
   slots.forEach(function(s){
-    var per = people.get(s.user); if(!per) return;
+    var per = people.get(s.user); if (!per) return;
     s.net = s.booked - s.refunded;
-    if (s.cancelled){ per.wasted += s.net; return; }
-    per.attended++;
+    if (s.cancelled) per.wasted += s.net; else per.attended++;
   });
 
   var list = Array.from(people.values());
-  list.forEach(function(per,i){
-    per.net = per.spent - per.refunded;
-    per.color = "var("+COLORS[i%COLORS.length]+")";
-  });
-
-  var used = list.reduce(function(a,b){ return a+b.net; },0);
   var n = list.length || 1;
-  list.forEach(function(per){
-    per.quota = pool/n;
+  list.forEach(function(per, i){
+    per.net   = per.spent - per.refunded;
+    per.key   = KEYS[i % KEYS.length];
+    per.color = "var(" + per.key + ")";
+    per.quota = pool / n;
     per.left  = per.quota - per.net;
   });
 
-  return {
-    people: list, slots: Array.from(slots.values()),
-    pool: pool, used: used, left: pool-used,
-    expiry: p.expiry, n: n
-  };
+  var used = list.reduce(function(a,b){ return a + b.net; }, 0);
+  return { people:list, slots:Array.from(slots.values()), pool:pool, used:used,
+           left:pool - used, expiry:p.expiry, n:n };
 }
 
-/* ---------- render ---------- */
+/* ── 畫面 ─────────────────────────────────── */
 
-var state = { data: null, filter: null };
-
-function fmtDays(d){ return d; }
+var state = { data:null, filter:null };
 
 function render(){
   var d = state.data;
+
   if (!d || !d.people.length){
-    $("v-balance").innerHTML = '<p class="empty">還沒有資料<br>到「資料」分頁貼上紀錄</p>';
+    $("k-left").textContent = $("k-class").textContent = $("k-days").textContent = "—";
+    $("v-balance").innerHTML =
+      '<div class="blank"><b>還沒有資料</b>' +
+      '<p>把訂課網站 Details 表格整段複製，貼到「資料」分頁。</p>' +
+      '<button class="btn" style="flex:0 0 auto;padding:12px 22px" data-go="data">前往資料</button></div>';
+    var go = $("v-balance").querySelector("[data-go]");
+    if (go) go.addEventListener("click", function(){ tab("data"); });
     $("v-classes").innerHTML = "";
-    $("sub").textContent = "—";
     return;
   }
 
-  /* header */
-  var classes = Math.floor(d.left/4);
-  $("sub").innerHTML = "剩 <b>"+d.left+"</b> 點 · 約 <b>"+classes+"</b> 堂"+
-    (d.expiry ? " · "+d.expiry.slice(5).replace("-","/")+" 到期" : "");
-
+  $("k-left").textContent  = trim(d.left);
+  $("k-class").textContent = Math.floor(d.left / UNIT);
   if (d.expiry){
-    var today = new Date(); today.setHours(0,0,0,0);
-    var days = Math.round((new Date(d.expiry+"T00:00:00") - today)/86400000);
-    $("days").textContent = days;
-    $("dayslabel").textContent = "剩餘天數";
-  } else { $("days").textContent = "—"; }
+    var t = new Date(); t.setHours(0,0,0,0);
+    $("k-days").textContent = Math.round((new Date(d.expiry + "T00:00:00") - t) / 86400000);
+  } else $("k-days").textContent = "—";
 
-  /* balance */
-  var sorted = d.people.slice().sort(function(a,b){ return b.left-a.left; });
-  var stack = d.people.map(function(p){
-    return '<i style="width:'+(d.pool? p.net/d.pool*100:0)+'%;background:'+p.color+'"></i>';
-  }).join("") + '<i style="flex:1;background:var(--line)"></i>';
+  var split = d.people.map(function(p){
+    return '<i style="width:' + (d.pool ? p.net/d.pool*100 : 0) + '%;background:' + p.color + '"></i>';
+  }).join("") + '<i style="flex:1;background:var(--track)"></i>';
+
+  var sorted = d.people.slice().sort(function(a,b){ return b.left - a.left; });
 
   $("v-balance").innerHTML =
-    '<div class="total"><b class="big n">'+d.left+'<em>點</em></b><span class="tl">還沒用掉</span><span class="stack">'+stack+"</span></div>" +
-    sorted.map(function(p,i){
-      var pct = p.quota ? Math.max(0,Math.min(100, p.left/p.quota*100)) : 0;
-      var c = Math.floor(p.left/4);
-      var sub = c>0 ? "還能上 "+c+" 堂" : "不夠一堂了";
-      return '<div class="card" style="--i:'+i+'">' +
-        '<div class="crow">' +
-          '<b class="big n" style="color:'+p.color+'">'+num(p.left)+'<em>點</em></b>' +
-          '<div class="cwho">' +
-            '<div class="cname"><span class="dot" style="background:'+p.color+'"></span>'+esc(p.name)+"</div>" +
-            '<div class="csub'+(c>0?"":" low")+'">'+sub+"</div>" +
+    '<div class="split">' + split + "</div>" +
+    '<div class="people">' + sorted.map(function(p,i){
+      var total = Math.floor(p.quota / UNIT);
+      var have  = Math.max(0, Math.floor(p.left / UNIT));
+      var pips = "";
+      for (var j = 0; j < total; j++)
+        pips += '<i style="--j:' + j + '"' + (j < have ? " data-f" : "") + "></i>";
+      return '<article class="person" style="--i:' + i + ';--k:var(' + p.key + ')">' +
+        '<div class="phead">' +
+          '<span class="tag"></span>' +
+          '<span class="pname">' + esc(p.name) + "</span>" +
+          '<span class="pused">' + p.net + " / " + trim(p.quota) + "</span>" +
+        "</div>" +
+        '<div class="pmain">' +
+          '<div class="pleft"><b class="n">' + trim(p.left) + '</b><span class="lbl">剩餘點數</span></div>' +
+          '<div class="pright">' +
+            '<div class="pips">' + pips + "</div>" +
+            '<div class="pfoot' + (have ? "" : " low") + '">' +
+              '<span class="lbl">可上堂數</span>' +
+              '<b class="n">' + have + " / " + total + "</b>" +
+            "</div>" +
           "</div>" +
         "</div>" +
-        '<div class="bar"><i style="width:'+pct.toFixed(1)+"%;background:"+p.color+'"></i></div>' +
-        '<div class="blabel"><span>已上 '+p.attended+" 堂</span><span>用了 "+p.net+" / "+num(p.quota)+"</span></div>" +
-      "</div>";
-    }).join("");
+      "</article>";
+    }).join("") + "</div>";
 
   renderClasses();
 }
 
-function num(v){ return (Math.round(v*10)/10).toString().replace(/\.0$/,""); }
-
 function renderClasses(){
-  var d = state.data;
-  var now = new Date();
+  var d = state.data, now = new Date(), groups = new Map();
 
-  /* 同一堂課合併成一列，記下有誰 */
-  var byClass = new Map();
   d.slots.forEach(function(s){
     if (!s.date) return;
-    var key = s.date+" "+s.time+"|"+s.title;
-    var g = byClass.get(key);
-    if (!g){ g = { date:s.date, time:s.time, title:s.title, who:[], gone:[], pts:s.net }; byClass.set(key,g); }
-    if (s.cancelled) g.gone.push(s); else g.who.push(s);
+    var k = s.date + s.time + "|" + s.title;
+    var g = groups.get(k);
+    if (!g){ g = { date:s.date, time:s.time, title:s.title, on:[], off:[] }; groups.set(k, g); }
+    (s.cancelled ? g.off : g.on).push(s);
   });
 
-  var all = Array.from(byClass.values()).filter(function(g){
-    if (state.filter){
-      var hit = g.who.concat(g.gone).some(function(s){ return s.user===state.filter; });
-      if (!hit) return false;
-    }
-    return g.who.length || g.gone.length;
+  var color = {};
+  d.people.forEach(function(p){ color[p.name] = p.color; });
+
+  var all = Array.from(groups.values()).filter(function(g){
+    if (!state.filter) return true;
+    return g.on.concat(g.off).some(function(s){ return s.user === state.filter; });
   });
 
-  var colorOf = {};
-  d.people.forEach(function(p){ colorOf[p.name] = p.color; });
+  var when = function(g){ return new Date(g.date + "T" + g.time + ":00"); };
+  var next = all.filter(function(g){ return when(g) >= now && g.on.length; })
+                .sort(function(a,b){ return when(a) - when(b); });
+  var past = all.filter(function(g){ return !(when(g) >= now && g.on.length); })
+                .sort(function(a,b){ return when(b) - when(a); });
 
-  var upcoming = all.filter(function(g){ return new Date(g.date+"T"+g.time+":00") >= now && g.who.length; })
-                    .sort(function(a,b){ return a.date+a.time < b.date+b.time ? -1 : 1; });
-  var past = all.filter(function(g){ return !(new Date(g.date+"T"+g.time+":00") >= now && g.who.length); })
-                .sort(function(a,b){ return a.date+a.time > b.date+b.time ? -1 : 1; });
-
-  var chips = '<button class="chip" aria-pressed="'+(!state.filter)+'" data-f="">全部</button>' +
+  var chips = '<button class="chip" aria-pressed="' + !state.filter + '" data-f="">全部</button>' +
     d.people.map(function(p){
-      return '<button class="chip" aria-pressed="'+(state.filter===p.name)+'" data-f="'+esc(p.name)+'">' +
-             '<span class="dot" style="background:'+p.color+'"></span>'+esc(p.name)+"</button>";
+      return '<button class="chip" aria-pressed="' + (state.filter === p.name) + '" data-f="' + esc(p.name) + '">' +
+             '<i style="width:7px;height:7px;border-radius:50%;background:' + p.color + '"></i>' + esc(p.name) + "</button>";
     }).join("");
 
-  function row(g, isNext){
-    var dt = new Date(g.date+"T"+g.time+":00");
-    var dots = g.who.map(function(s){
-      return '<span class="dot" style="background:'+(colorOf[s.user]||"var(--line)")+'" title="'+esc(s.user)+'"></span>';
+  function row(g){
+    var dt = when(g), only = !g.on.length;
+    var who = g.on.map(function(s){
+      return '<i style="background:' + (color[s.user] || "var(--track)") + '" title="' + esc(s.user) + '"></i>';
+    }).join("") + g.off.map(function(s){
+      return '<i style="box-shadow:inset 0 0 0 1.5px ' + (color[s.user] || "var(--track)") + '" title="' + esc(s.user) + ' 已取消"></i>';
     }).join("");
-    var goneDots = g.gone.map(function(s){
-      return '<span class="dot" style="background:transparent;box-shadow:inset 0 0 0 1.5px '+(colorOf[s.user]||"var(--line)")+'" title="'+esc(s.user)+' 已取消"></span>';
-    }).join("");
-    var only = !g.who.length;
-    return '<div class="item'+(isNext?" next":"")+(only?" strike":"")+'">' +
-      '<div class="date"><b>'+(dt.getMonth()+1)+"/"+dt.getDate()+"</b><span>週"+WEEK[dt.getDay()]+"</span></div>" +
-      '<div class="info"><b>'+esc(g.title||"課程")+"</b><span>"+g.time+"</span></div>" +
-      '<div class="dots">'+dots+goneDots+"</div>" +
+    return '<div class="ev' + (only ? " off" : "") + '">' +
+      '<div class="evd"><b>' + (dt.getMonth()+1) + "/" + dt.getDate() + "</b><span>週" + WEEK[dt.getDay()] + "</span></div>" +
+      '<div class="evi"><b>' + esc(g.title || "課程") + "</b><span>" + g.time + "</span></div>" +
+      '<div class="evw">' + who + "</div>" +
     "</div>";
   }
 
-  var html = '<div class="chips">'+chips+"</div>";
-  if (upcoming.length){
-    html += '<div class="gtitle">即將上課</div>' + upcoming.map(function(g){ return row(g,true); }).join("");
-  }
+  var html = '<div class="chips">' + chips + "</div>";
+  if (next.length)
+    html += '<div class="glabel"><span class="lbl">即將上課</span></div><div class="list">' +
+            next.map(row).join("") + "</div>";
+
   if (past.length){
-    var curMonth = "";
-    html += past.map(function(g){
-      var mo = g.date.slice(0,7);
-      var head = "";
-      if (mo !== curMonth){
-        curMonth = mo;
-        head = '<div class="gtitle">'+mo.slice(0,4)+"年"+parseInt(mo.slice(5),10)+"月</div>";
+    var mo = null;
+    past.forEach(function(g){
+      var m = g.date.slice(0,7);
+      if (m !== mo){
+        if (mo !== null) html += "</div>";
+        html += '<div class="glabel"><span class="lbl">' + m.slice(0,4) + " / " + m.slice(5) + '</span></div><div class="list">';
+        mo = m;
       }
-      return head + row(g,false);
-    }).join("");
+      html += row(g);
+    });
+    html += "</div>";
   }
-  if (!upcoming.length && !past.length) html += '<p class="empty">沒有課程紀錄</p>';
+  if (!next.length && !past.length) html += '<div class="blank"><b>沒有紀錄</b></div>';
 
   $("v-classes").innerHTML = html;
   Array.prototype.forEach.call($("v-classes").querySelectorAll(".chip"), function(b){
-    b.addEventListener("click", function(){
-      state.filter = b.dataset.f || null;
-      renderClasses();
-    });
+    b.addEventListener("click", function(){ state.filter = b.dataset.f || null; renderClasses(); });
   });
 }
 
-/* ---------- data loading ---------- */
-
-function setStatus(text, warn){
-  $("status-t").textContent = text;
-  $("status").classList.toggle("warn", !!warn);
-}
+/* ── 資料 ─────────────────────────────────── */
 
 function apply(text, label, warn){
   state.data = build(text);
   $("raw").value = text.trim();
-  setStatus(label, warn);
+  $("sync-t").textContent = label;
+  $("sync").toggleAttribute("data-warn", !!warn);
   var d = state.data;
-  $("meta").textContent = d.people.length
-    ? "讀到 "+d.people.length+" 個人、"+d.slots.length+" 筆預約，共 "+d.pool+" 點（每人 "+num(d.pool/d.n)+" 點）。"
-    : "";
+  $("facts").innerHTML = d.people.length ? [
+    [d.people.length, "人數"], [d.pool, "總點數"], [trim(d.pool/d.n), "每人額度"], [d.slots.length, "預約筆數"]
+  ].map(function(f){
+    return '<div class="fact"><b class="n">' + f[0] + '</b><span class="lbl">' + f[1] + "</span></div>";
+  }).join("") : "";
   render();
 }
 
 function load(){
   var override = localStorage.getItem(K_RAW);
-  if (override){ apply(override, "手動貼上的資料", true); return; }
+  if (override){ apply(override, "本機資料", true); return; }
 
-  fetch("data.txt?t="+Date.now(), {cache:"no-store"})
-    .then(function(r){ if(!r.ok) throw new Error(r.status);
+  $("v-balance").innerHTML = '<div class="skel"><div></div><div></div><div></div></div>';
+  fetch("data.txt?t=" + Date.now(), { cache:"no-store" })
+    .then(function(r){
+      if (!r.ok) throw new Error(r.status);
       var lm = r.headers.get("last-modified");
-      return r.text().then(function(t){ return {t:t, lm:lm}; });
+      return r.text().then(function(t){ return { t:t, lm:lm }; });
     })
     .then(function(o){
-      var when = o.lm ? new Date(o.lm).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
-      apply(o.t, when ? "已同步 · "+when : "已同步", false);
+      var w = o.lm ? new Date(o.lm).toLocaleString("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
+      apply(o.t, w ? "已同步 " + w : "已同步", false);
     })
     .catch(function(){
-      setStatus("讀不到 data.txt，請手動貼上", true);
-      state.data = null; render();
+      state.data = null;
+      $("sync-t").textContent = "讀不到 data.txt";
+      $("sync").setAttribute("data-warn","");
+      render();
     });
 }
 
-/* ---------- wiring ---------- */
+/* ── 互動 ─────────────────────────────────── */
+
+function tab(v){
+  Array.prototype.forEach.call(document.querySelectorAll("nav button"), function(b){
+    b.setAttribute("aria-selected", String(b.dataset.v === v));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("main section"), function(s){
+    s.toggleAttribute("data-on", s.id === "v-" + v);
+  });
+  localStorage.setItem(K_TAB, v);
+  window.scrollTo(0,0);
+}
 
 Array.prototype.forEach.call(document.querySelectorAll("nav button"), function(b){
-  b.addEventListener("click", function(){
-    var v = b.dataset.v;
-    Array.prototype.forEach.call(document.querySelectorAll("nav button"), function(x){
-      x.setAttribute("aria-selected", String(x===b));
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("main section"), function(s){
-      s.classList.toggle("on", s.id === "v-"+v);
-    });
-    localStorage.setItem(K_TAB, v);
-    window.scrollTo(0,0);
-  });
+  b.addEventListener("click", function(){ tab(b.dataset.v); });
 });
 
 $("save").addEventListener("click", function(){
   var t = $("raw").value.trim();
-  if (!t) return;
+  if (!t){ $("raw").focus(); return; }
   localStorage.setItem(K_RAW, t);
-  apply(t, "手動貼上的資料", true);
-  document.querySelector('nav button[data-v="balance"]').click();
+  apply(t, "本機資料", true);
+  tab("balance");
 });
 
 $("reset").addEventListener("click", function(){
@@ -538,9 +538,9 @@ $("reset").addEventListener("click", function(){
 });
 
 var saved = localStorage.getItem(K_TAB);
-if (saved){ var btn = document.querySelector('nav button[data-v="'+saved+'"]'); if (btn) btn.click(); }
-
+if (saved) tab(saved);
 load();
+
 document.addEventListener("visibilitychange", function(){
   if (!document.hidden && !localStorage.getItem(K_RAW)) load();
 });
