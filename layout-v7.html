@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>好幣｜三人運動能量管線</title>
+  <style>
+    :root { --ink:#061a36; --blue:#47cfff; --blue-deep:#075187; --lemon:#e9ff38; --orange:#ff6b22; --paper:#effbff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:320px; background:#061a36; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif; }
+    .page { min-height:100vh; overflow:hidden; background:radial-gradient(circle at 46% 4%,#1f6796 0,#0b3159 25%,#061a36 67%); }
+    header { display:flex; justify-content:space-between; align-items:center; max-width:820px; padding:20px 22px 8px; margin:auto; color:#d9f6ff; }
+    .brand { font-weight:900; letter-spacing:.08em; }.period { padding:7px 10px; border:1px solid #69dfff; border-radius:99px; font-size:12px; }
+    .canvas { display:block; width:min(100%,820px); height:auto; margin:0 auto; overflow:visible; }
+    .label { fill:#061a36; font-weight:900; }.tiny { fill:#dff9ff; font-size:12px; font-weight:700; }.course { fill:#061a36; font-size:16px; font-weight:900; }.sub { fill:#23435f; font-size:11px; font-weight:700; }
+    .liquid { animation: pulse 3.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+    .bubble { animation: float 4s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }.bubble.slow { animation-delay:-1.5s; animation-duration:5.2s; }
+    .spark { animation: blink 2.3s ease-in-out infinite; }.module { filter:drop-shadow(0 8px 8px rgba(0,20,42,.22)); }
+    @keyframes pulse { 50% { opacity:.72; transform:scaleX(.97); } }
+    @keyframes float { 50% { transform:translateY(-12px); } }
+    @keyframes blink { 50% { opacity:.35; } }
+    @media (prefers-reduced-motion:reduce) { .liquid,.bubble,.spark { animation:none; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header><div class="brand">好幣 HAOCoin</div><div class="period">08 / FITNESS FLOW</div></header>
+    <svg class="canvas" viewBox="0 0 820 1540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三位會員的運動課程能量管線">
+      <defs>
+        <linearGradient id="glass" x1="0" x2="1"><stop stop-color="#075187"/><stop offset=".22" stop-color="#5ce0ff"/><stop offset=".5" stop-color="#dcfbff"/><stop offset=".78" stop-color="#299bd0"/><stop offset="1" stop-color="#063e72"/></linearGradient>
+        <linearGradient id="fuel" x1="0" x2="1"><stop stop-color="#98b400"/><stop offset=".38" stop-color="#e9ff38"/><stop offset=".62" stop-color="#fffec4"/><stop offset="1" stop-color="#abc900"/></linearGradient>
+        <linearGradient id="berry" x1="0" x2="1"><stop stop-color="#ff7b7b"/><stop offset=".5" stop-color="#ffd5d5"/><stop offset="1" stop-color="#e94c73"/></linearGradient>
+        <linearGradient id="cream" x1="0" x2="1"><stop stop-color="#ffbd57"/><stop offset=".5" stop-color="#fff2b6"/><stop offset="1" stop-color="#f07734"/></linearGradient>
+        <linearGradient id="mint" x1="0" x2="1"><stop stop-color="#42d9bb"/><stop offset=".5" stop-color="#d5fff1"/><stop offset="1" stop-color="#2c9fbb"/></linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <text x="410" y="49" text-anchor="middle" class="tiny" style="letter-spacing:.18em">THIS WEEK'S ENERGY DISTRIBUTION</text>
+      <!-- hero hourglass -->
+      <g aria-label="57 個好幣能量沙漏">
+        <path d="M345 76H475 L456 176Q410 230 364 176Z M364 254Q410 202 456 254L475 354H345Z" fill="url(#glass)" stroke="#b8f8ff" stroke-width="4"/>
+        <path class="liquid" d="M369 91H451L441 160Q410 193 379 160Z" fill="url(#fuel)"/>
+        <path class="liquid" d="M383 277Q410 250 437 277L449 337H371Z" fill="url(#fuel)"/>
+        <path d="M410 183v56" stroke="#e9ff38" stroke-width="9" stroke-linecap="round" filter="url(#glow)"/>
+        <circle class="spark" cx="410" cy="212" r="7" fill="#fff"/>
+        <text x="410" y="144" text-anchor="middle" class="label" font-size="45">57</text>
+        <text x="410" y="315" text-anchor="middle" class="label" font-size="13">好幣能量</text>
+      </g>
+      <!-- short gooey distributor -->
+      <path d="M410 356v48c0 17-14 23-30 28l-80 24M410 404c0 17 14 23 30 28l8 3M410 404c0 17 14 23 30 28l105 27" fill="none" stroke="#3bd1ff" stroke-width="31" stroke-linecap="round"/>
+      <path d="M410 356v48c0 17-14 23-30 28l-80 24M410 404c0 17 14 23 30 28l8 3M410 404c0 17 14 23 30 28l105 27" fill="none" stroke="#e9ff38" stroke-width="13" stroke-linecap="round"/>
+      <circle class="bubble" cx="389" cy="386" r="7" fill="#c9fbff"/><circle class="bubble slow" cx="433" cy="415" r="5" fill="#c9fbff"/>
+
+      <!-- permanent irregular pipes: blue glass exterior, lemon core -->
+      <g id="pipe-berry" aria-label="莓果重拳管線">
+        <path d="M300 460C233 483 174 504 180 579C186 649 263 643 251 732C242 800 191 809 190 882V1168" fill="none" stroke="url(#glass)" stroke-width="55" stroke-linecap="round"/>
+        <path class="liquid" d="M300 460C233 483 174 504 180 579C186 649 263 643 251 732C242 800 191 809 190 882V1168" fill="none" stroke="url(#fuel)" stroke-width="23" stroke-linecap="round"/>
+        <path d="M282 470C229 498 201 523 207 571" fill="none" stroke="#e8fbff" stroke-width="7" opacity=".82" stroke-linecap="round"/>
+        <circle class="bubble" cx="200" cy="687" r="8" fill="#d8fcff"/>
+      </g>
+      <g id="pipe-cream" aria-label="奶油鐵手管線">
+        <path d="M448 440C469 516 453 578 470 651C488 727 442 786 454 864C467 950 493 1025 470 1177" fill="none" stroke="url(#glass)" stroke-width="55" stroke-linecap="round"/>
+        <path class="liquid" d="M448 440C469 516 453 578 470 651C488 727 442 786 454 864C467 950 493 1025 470 1177" fill="none" stroke="url(#fuel)" stroke-width="23" stroke-linecap="round"/>
+        <path d="M451 460C464 506 456 540 464 581" fill="none" stroke="#e8fbff" stroke-width="7" opacity=".82" stroke-linecap="round"/>
+        <circle class="bubble slow" cx="467" cy="727" r="8" fill="#d8fcff"/>
+      </g>
+      <g id="pipe-mint" aria-label="薄荷軟骨管線">
+        <path d="M547 464C619 483 666 507 651 575C635 645 555 651 574 731C594 809 640 809 632 887V1139" fill="none" stroke="url(#glass)" stroke-width="55" stroke-linecap="round"/>
+        <path class="liquid" d="M547 464C619 483 666 507 651 575C635 645 555 651 574 731C594 809 640 809 632 887V1139" fill="none" stroke="url(#fuel)" stroke-width="23" stroke-linecap="round"/>
+        <path d="M565 474C611 488 637 514 631 556" fill="none" stroke="#e8fbff" stroke-width="7" opacity=".82" stroke-linecap="round"/>
+        <circle class="bubble" cx="623" cy="694" r="8" fill="#d8fcff"/>
+      </g>
+
+      <!-- attached course modules -->
+      <g class="module" transform="translate(265 535)">
+        <path d="M0 23Q0 0 23 0H266Q289 0 289 23V83Q289 106 266 106H23Q0 106 0 83Z" fill="#f8ffff" stroke="#0a4a78" stroke-width="4"/>
+        <rect x="14" y="15" width="58" height="76" rx="16" fill="#e9ff38"/><text x="43" y="48" text-anchor="middle" class="label" font-size="14">共享</text><text x="43" y="72" text-anchor="middle" class="label" font-size="20">8-14</text>
+        <text x="89" y="46" class="course">瑜伽輪</text><text x="89" y="71" class="sub">莓果 ↔ 奶油 · 流動核心</text>
+      </g>
+      <path d="M294 588h-38M554 588h39" stroke="#e9ff38" stroke-width="13" stroke-linecap="round"/>
+      <g class="module" transform="translate(55 755)">
+        <path d="M0 20Q0 0 20 0H196Q216 0 216 20V87Q216 107 196 107H20Q0 107 0 87Z" fill="#f8ffff" stroke="#0a4a78" stroke-width="4"/>
+        <rect x="14" y="15" width="57" height="77" rx="16" fill="#ff8958"/><text x="43" y="47" text-anchor="middle" class="label" font-size="20">8-18</text><text x="88" y="53" class="course">拳擊有氧</text><text x="88" y="77" class="sub">莓果的重拳回合</text>
+      </g>
+      <path d="M190 759v-30" stroke="#e9ff38" stroke-width="13" stroke-linecap="round"/>
+      <g class="module" transform="translate(550 774)">
+        <path d="M0 20Q0 0 20 0H210Q230 0 230 20V87Q230 107 210 107H20Q0 107 0 87Z" fill="#f8ffff" stroke="#0a4a78" stroke-width="4"/>
+        <rect x="14" y="15" width="57" height="77" rx="16" fill="#82eed8"/><text x="43" y="47" text-anchor="middle" class="label" font-size="20">8-20</text><text x="88" y="53" class="course">皮拉提斯</text><text x="88" y="77" class="sub">薄荷的柔韌日</text>
+      </g>
+      <path d="M632 778v-30" stroke="#e9ff38" stroke-width="13" stroke-linecap="round"/>
+
+      <!-- uneven terminal personal summary capsules -->
+      <g id="summary-berry" transform="translate(93 1175) rotate(-3 100 150)" aria-label="莓果重拳個人摘要">
+        <path d="M20 0H180Q200 0 200 20V247Q200 278 100 291Q0 278 0 247V20Q0 0 20 0Z" fill="url(#berry)" stroke="#d7faff" stroke-width="5"/>
+        <circle cx="100" cy="46" r="26" fill="#fff0ef"/><text x="100" y="53" text-anchor="middle" class="label" font-size="22">16</text>
+        <text x="100" y="94" text-anchor="middle" class="label" font-size="18">莓果重拳</text><text x="100" y="119" text-anchor="middle" class="sub">本週完成</text>
+        <text x="100" y="154" text-anchor="middle" class="label" font-size="27">4/14</text><path d="M36 176H164" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity=".8"/><path d="M36 176H73" stroke="#061a36" stroke-width="9" stroke-linecap="round"/>
+        <text x="100" y="216" text-anchor="middle" class="label" font-size="15">已消耗 42/58</text>
+      </g>
+      <g id="summary-cream" transform="translate(370 1180) scale(1.08)" aria-label="奶油鐵手個人摘要">
+        <path d="M20 0H180Q200 0 200 20V247Q200 278 100 291Q0 278 0 247V20Q0 0 20 0Z" fill="url(#cream)" stroke="#d7faff" stroke-width="5"/>
+        <circle cx="100" cy="46" r="26" fill="#fff6d6"/><text x="100" y="53" text-anchor="middle" class="label" font-size="22">18</text>
+        <text x="100" y="94" text-anchor="middle" class="label" font-size="18">奶油鐵手</text><text x="100" y="119" text-anchor="middle" class="sub">本週完成</text>
+        <text x="100" y="154" text-anchor="middle" class="label" font-size="27">4/14</text><path d="M36 176H164" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity=".8"/><path d="M36 176H73" stroke="#061a36" stroke-width="9" stroke-linecap="round"/>
+        <text x="100" y="216" text-anchor="middle" class="label" font-size="15">已消耗 40/58</text>
+      </g>
+      <g id="summary-mint" transform="translate(580 1160) rotate(3 86 150) scale(.9)" aria-label="薄荷軟骨個人摘要">
+        <path d="M20 0H180Q200 0 200 20V247Q200 278 100 291Q0 278 0 247V20Q0 0 20 0Z" fill="url(#mint)" stroke="#d7faff" stroke-width="5"/>
+        <circle cx="100" cy="46" r="26" fill="#eafff7"/><text x="100" y="53" text-anchor="middle" class="label" font-size="22">23</text>
+        <text x="100" y="94" text-anchor="middle" class="label" font-size="18">薄荷軟骨</text><text x="100" y="119" text-anchor="middle" class="sub">本週完成</text>
+        <text x="100" y="154" text-anchor="middle" class="label" font-size="27">5/14</text><path d="M36 176H164" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity=".8"/><path d="M36 176H82" stroke="#061a36" stroke-width="9" stroke-linecap="round"/>
+        <text x="100" y="216" text-anchor="middle" class="label" font-size="15">已消耗 35/58</text>
+      </g>
+      <text x="410" y="1510" text-anchor="middle" class="tiny">MOVE · COLLECT · FLOW</text>
+    </svg>
+  </main>
+</body>
+</html>
