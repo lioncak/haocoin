@@ -32,7 +32,7 @@
 <rect width="700" height="1700" fill="url(#bg)"/>
 <ellipse cx="120" cy="500" rx="185" ry="275" fill="#0d67bd" opacity=".18" filter="url(#soft)"/>
 <ellipse cx="610" cy="1190" rx="170" ry="245" fill="#156bbb" opacity=".22" filter="url(#soft)"/>
-<g opacity=".96">
+<g opacity=".68">
   <path id="background-pipe-left" d="M-48 155H72Q134 155 134 78V-36" fill="none" stroke="#031127" stroke-width="66" stroke-linecap="round"/>
   <path d="M-48 155H72Q134 155 134 78V-36" fill="none" stroke="url(#glass)" stroke-width="51" stroke-linecap="round"/>
   <path d="M-38 139H66Q115 139 115 72V-30" fill="none" stroke="#bcf9ff" stroke-width="8" stroke-linecap="round" opacity=".7"/>
@@ -42,7 +42,7 @@
   <path d="M720 1420Q628 1420 628 1515V1730" fill="none" stroke="#031127" stroke-width="72"/><path d="M720 1420Q628 1420 628 1515V1730" fill="none" stroke="url(#glass)" stroke-width="56"/>
 </g>
 <!-- orange and yellow hydraulic ribbons -->
-<g fill="none" stroke-linecap="round" opacity=".94">
+<g fill="none" stroke-linecap="round" opacity=".58">
   <path id="ribbon-orange" d="M-35 610C100 530 130 680 248 605S435 528 720 640" stroke="#fe6d26" stroke-width="10"/>
   <path d="M-35 635C100 555 130 705 248 630S435 553 720 665" stroke="#ff9e40" stroke-width="10"/>
   <path d="M-35 660C100 580 130 730 248 655S435 578 720 690" stroke="#ffd04a" stroke-width="10"/>
@@ -60,11 +60,12 @@
   <rect x="196" y="184" width="308" height="400" rx="48" fill="#061d42" stroke="#8eeeff" stroke-width="10"/>
   <rect x="205" y="193" width="290" height="382" rx="42" fill="url(#glass)" opacity=".81"/>
   <g clip-path="url(#hourglass-clip)">
-    <path id="jelly-top-wave" fill="url(#jelly)" opacity=".94"/>
-    <path id="jelly-bottom-wave" fill="url(#jelly)" opacity=".97"/>
-    <path d="M224 224C280 260 309 284 350 336C391 284 420 260 476 224" fill="none" stroke="#e6ffff" stroke-width="11" opacity=".55"/>
-    <path d="M224 544C281 500 315 461 350 406C385 461 419 500 476 544" fill="none" stroke="#e6ffff" stroke-width="11" opacity=".43"/>
-    <g fill="none" stroke="#c5ffff" stroke-width="4" opacity=".65"><circle cx="283" cy="314" r="13"/><circle cx="404" cy="358" r="8"/><circle cx="313" cy="491" r="9"/><circle cx="412" cy="522" r="14"/><circle cx="363" cy="459" r="5"/></g>
+    <path id="jelly-top-mass" d="M218 256 C258 221 305 212 350 229 C395 212 442 221 482 256 L482 292 C443 307 405 330 378 364 C366 379 359 390 350 402 C341 390 334 379 322 364 C295 330 257 307 218 292 Z" fill="url(#jelly)" opacity=".88"/>
+    <path id="jelly-neck" d="M322 363 C334 379 341 390 350 405 C359 390 366 379 378 363 C373 390 365 412 350 430 C335 412 327 390 322 363Z" fill="#42eaff" opacity=".91"/>
+    <path id="jelly-bottom-mass" d="M350 426 C370 447 388 470 421 492 C443 507 465 520 482 534 L482 564 L218 564 L218 534 C235 520 257 507 279 492 C312 470 330 447 350 426Z" fill="url(#jelly)" opacity=".9"/>
+    <path id="jelly-top-wave" fill="none" stroke="#d7ffff" stroke-width="7" stroke-linecap="round" opacity=".82"/>
+    <path id="jelly-bottom-wave" fill="none" stroke="#d7ffff" stroke-width="7" stroke-linecap="round" opacity=".82"/>
+    <g fill="none" stroke="#c5ffff" stroke-width="4" opacity=".7"><circle cx="285" cy="273" r="10"/><circle cx="402" cy="279" r="7"/><circle cx="326" cy="477" r="9"/><circle cx="410" cy="526" r="13"/><circle cx="365" cy="500" r="5"/></g>
   </g>
   <path d="M227 207V545" stroke="#d9ffff" stroke-width="11" stroke-linecap="round" opacity=".48"/>
   <path d="M478 212V526" stroke="#0a5a9a" stroke-width="13" stroke-linecap="round" opacity=".56"/>
@@ -82,20 +83,19 @@
   <path d="M350 612V768" stroke="#031127" stroke-width="78"/><path d="M350 612V768" stroke="url(#glass-vertical)" stroke-width="58"/><path d="M350 612V768" stroke="#e3ff16" stroke-width="24" filter="url(#glow)"/>
   <circle cx="350" cy="790" r="76" fill="#06254d"/><circle cx="350" cy="790" r="62" fill="url(#joint)"/><circle cx="350" cy="790" r="29" fill="url(#orange)"/><circle cx="340" cy="779" r="9" fill="#ffd19a" opacity=".75"/>
 </g>
-<!-- exactly three transparent glass pipes from the distributor -->
+<!-- exactly three round transparent glass pipes: each exits screen at a different x -->
 <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path id="pipe-left" d="M303 810H120Q78 810 78 852V1052" stroke="#031127" stroke-width="72"/>
-  <path d="M303 810H120Q78 810 78 852V1052" stroke="url(#glass)" stroke-width="55"/>
-  <path id="fuel-left" d="M303 810H120Q78 810 78 852V1052" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
-  <path id="pipe-right" d="M397 810H580Q622 810 622 852V1052" stroke="#031127" stroke-width="72"/>
-  <path d="M397 810H580Q622 810 622 852V1052" stroke="url(#glass)" stroke-width="55"/>
-  <path id="fuel-right" d="M397 810H580Q622 810 622 852V1052" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
-  <path id="pipe-stem" d="M350 863V1398" stroke="#031127" stroke-width="76"/>
-  <path d="M350 863V1398" stroke="url(#glass-vertical)" stroke-width="58"/>
-  <path id="fuel-stem" d="M350 863V1398" stroke="#e3ff16" stroke-width="25" filter="url(#glow)"/>
+  <path id="pipe-left" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="#031127" stroke-width="74"/>
+  <path d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="url(#glass)" stroke-width="56"/>
+  <path id="fuel-left" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
+  <path id="pipe-right" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="#031127" stroke-width="74"/>
+  <path d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="url(#glass)" stroke-width="56"/>
+  <path id="fuel-right" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
+  <path id="pipe-stem" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="#031127" stroke-width="76"/>
+  <path d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="url(#glass-vertical)" stroke-width="58"/>
+  <path id="fuel-stem" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="#e3ff16" stroke-width="25" filter="url(#glow)"/>
 </g>
-<g fill="url(#joint)" stroke="#a8f5ff" stroke-width="5"><circle cx="78" cy="1052" r="39"/><circle cx="622" cy="1052" r="39"/><circle cx="350" cy="1398" r="42"/></g>
-<g fill="#e6ff24" filter="url(#glow)"><circle id="flow-left" cx="170" cy="810" r="11"/><circle id="flow-right" cx="530" cy="810" r="11"/><circle id="flow-stem" cx="350" cy="980" r="12"/></g>
+<g fill="#e6ff24" filter="url(#glow)"><ellipse id="flow-left" cx="238" cy="826" rx="13" ry="8"/><ellipse id="flow-right" cx="462" cy="826" rx="13" ry="8"/><ellipse id="flow-stem" cx="350" cy="965" rx="8" ry="13"/></g>
 <path d="M-28 1530Q105 1395 182 1550" fill="none" stroke="#ff9c31" stroke-width="18" opacity=".82"/><path d="M-28 1570Q105 1435 182 1590" fill="none" stroke="#fff13a" stroke-width="12" opacity=".82"/>
 </svg>
 <script>
@@ -109,6 +109,9 @@
       this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
       this.top = svg.querySelector('#jelly-top-wave');
       this.bottom = svg.querySelector('#jelly-bottom-wave');
+      this.topMass = svg.querySelector('#jelly-top-mass');
+      this.bottomMass = svg.querySelector('#jelly-bottom-mass');
+      this.neck = svg.querySelector('#jelly-neck');
       this.droplet = svg.querySelector('#neck-droplet');
       this.flows = ['#flow-left', '#flow-right', '#flow-stem'].map((id) => svg.querySelector(id));
       this.tick = this.tick.bind(this);
@@ -119,22 +122,27 @@
       this.total = total;
       this.used = total - this.remaining;
     }
-    wavePath(y, amplitude, phase, top) {
-      let d = `M 208 ${y}`;
-      for (let x = 208; x <= 492; x += 8) {
+    wavePath(y, amplitude, phase) {
+      let d = `M 230 ${y}`;
+      for (let x = 230; x <= 470; x += 8) {
         const wave = Math.sin((x / 32) + phase) * amplitude;
         d += ` L ${x} ${(y + wave).toFixed(2)}`;
       }
-      return top ? `${d} L 492 198 L 208 198 Z` : `${d} L 492 570 L 208 570 Z`;
+      return d;
     }
     tick(ms) {
       const target = this.remaining / this.total;
       this.displayRatio += (target - this.displayRatio) * .035;
       const phase = ms / 700;
-      const topY = 252 + (1 - this.displayRatio) * 138;
-      const bottomY = 520 - (1 - this.displayRatio) * 138;
-      this.top.setAttribute('d', this.wavePath(topY, 7, phase, true));
-      this.bottom.setAttribute('d', this.wavePath(bottomY, 8, -phase * 1.2, false));
+      const topY = 250 + (1 - this.displayRatio) * 28;
+      const bottomY = 538 - (1 - this.displayRatio) * 16;
+      this.top.setAttribute('d', this.wavePath(topY, 5, phase));
+      this.bottom.setAttribute('d', this.wavePath(bottomY, 6, -phase * 1.2));
+      const topScale = .62 + this.displayRatio * .38;
+      const bottomScale = .65 + (1 - this.displayRatio) * .35;
+      this.topMass.setAttribute('transform', `translate(350 405) scale(1 ${topScale.toFixed(3)}) translate(-350 -405)`);
+      this.neck.setAttribute('transform', `translate(350 405) scale(1 ${topScale.toFixed(3)}) translate(-350 -405)`);
+      this.bottomMass.setAttribute('transform', `translate(350 430) scale(1 ${bottomScale.toFixed(3)}) translate(-350 -430)`);
       const dropletY = 398 + ((ms % 900) / 900) * 62;
       this.droplet.setAttribute('transform', `translate(0 ${(this.reduced ? 24 : dropletY - 398).toFixed(1)}) scale(.78)`);
       this.flows.forEach((node, index) => {

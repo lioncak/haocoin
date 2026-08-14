@@ -6,7 +6,7 @@ const html = await readFile(new URL('../layout-v7.html', import.meta.url), 'utf8
 const pipeIds = [...html.matchAll(/id=["'](pipe-[^"']+)["']/g)].map((match) => match[1]);
 assert.deepEqual(pipeIds.sort(), ['pipe-left', 'pipe-right', 'pipe-stem'], 'the distributor must expose exactly three glass pipe paths');
 
-for (const id of ['jelly-top-wave', 'jelly-bottom-wave', 'hourglass-shell', 'background-pipe-left', 'background-pipe-right', 'ribbon-orange', 'ribbon-yellow']) {
+for (const id of ['jelly-top-mass', 'jelly-bottom-mass', 'jelly-neck', 'jelly-top-wave', 'jelly-bottom-wave', 'hourglass-shell', 'background-pipe-left', 'background-pipe-right', 'ribbon-orange', 'ribbon-yellow']) {
   assert.match(html, new RegExp(`id=["']${id}["']`), `missing visual layer: ${id}`);
 }
 
