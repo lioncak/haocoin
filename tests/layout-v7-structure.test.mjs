@@ -23,7 +23,8 @@ assert.match(html, /cancelAnimationFrame/, 'reduced-motion changes must cancel a
 assert.match(html, /setProgress[\s\S]*?this\.used\s*=\s*safeTotal\s*-\s*this\.remaining;\s*if\s*\(this\.reduced\)[\s\S]*?this\.displayRatio\s*=\s*this\.remaining\s*\/\s*this\.total;[\s\S]*?this\.tick\(0\)/, 'reduced-motion progress updates must render a static liquid state');
 assert.match(html, /id=["']hourglass-remaining["']/, 'missing shared hourglass remaining value');
 assert.match(html, />57</, 'the shared remaining value must be 57');
-assert.match(html, /共享剩餘課程/, 'missing shared remaining caption');
+assert.match(html, /總剩餘課程/, 'missing neutral remaining caption');
+assert.doesNotMatch(html, /共享剩餘課程/, 'the hourglass must not imply shared-class behavior');
 assert.match(html, /hourglass-remaining[\s\S]*?font-size=["'](?:5[0-9]|[6-9][0-9])["']/, 'the hero remaining value must be the largest numeric label');
 
 for (const reservoir of ['reservoir-berry', 'reservoir-cream', 'reservoir-mint']) {
@@ -41,15 +42,15 @@ for (const [name, remaining, completed, consumed] of [
   assert.match(html, new RegExp(consumed), `missing consumed value: ${consumed}`);
 }
 
-for (const module of ['module-yoga-berry', 'module-yoga-cream', 'module-boxing-mint', 'module-pilates-cream']) {
+for (const module of ['module-yoga-berry', 'module-boxing-mint', 'module-pilates-cream']) {
   assert.match(html, new RegExp(`id=["']${module}["']`), `missing course valve: ${module}`);
 }
 for (const icon of ['icon-yoga', 'icon-boxing', 'icon-pilates']) {
   assert.match(html, new RegExp(`id=["']${icon}["']`), `missing activity icon: ${icon}`);
 }
-assert.match(html, /id=["']bridge-yoga["']/, 'the shared yoga modules need their own bridge');
-assert.match(html, /stroke-dasharray/, 'the shared yoga bridge must be visibly dashed');
+assert.doesNotMatch(html, /module-yoga-cream/, 'a duplicate yoga valve is no longer needed');
+assert.doesNotMatch(html, /id=["']bridge-yoga["']/, 'the shared yoga bridge is no longer needed');
 
-for (const material of ['specular-dual', 'cyan-reservoir-glow', 'bubble-field', 'compression-seal', 'energy-particle']) {
+for (const material of ['specular-dual', 'cyan-reservoir-glow', 'bubble-field', 'compression-seal']) {
   assert.match(html, new RegExp(`(?:id|class)=["'][^"']*${material}[^"']*["']`), `missing material layer: ${material}`);
 }
