@@ -127,6 +127,10 @@
       this.total = safeTotal;
       this.remaining = Math.max(0, Math.min(Number.isFinite(safeRemaining) ? safeRemaining : 0, safeTotal));
       this.used = safeTotal - this.remaining;
+      if (this.reduced) {
+        this.displayRatio = this.remaining / this.total;
+        this.tick(0);
+      }
     }
     start() {
       if (!this.reduced && this.rafId === null) this.rafId = requestAnimationFrame(this.tick);

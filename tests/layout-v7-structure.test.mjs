@@ -20,3 +20,4 @@ assert.match(html, /prefers-reduced-motion/, 'missing reduced-motion handling');
 assert.match(html, /Number\.isFinite/, 'setProgress must reject non-finite progress inputs');
 assert.match(html, /addEventListener\(['"]change['"]/, 'reduced-motion preference changes must be observed');
 assert.match(html, /cancelAnimationFrame/, 'reduced-motion changes must cancel active animation frames');
+assert.match(html, /setProgress[\s\S]*?this\.used\s*=\s*safeTotal\s*-\s*this\.remaining;\s*if\s*\(this\.reduced\)[\s\S]*?this\.displayRatio\s*=\s*this\.remaining\s*\/\s*this\.total;[\s\S]*?this\.tick\(0\)/, 'reduced-motion progress updates must render a static liquid state');
