@@ -21,6 +21,10 @@ assert.match(html, /Number\.isFinite/, 'setProgress must reject non-finite progr
 assert.match(html, /addEventListener\(['"]change['"]/, 'reduced-motion preference changes must be observed');
 assert.match(html, /cancelAnimationFrame/, 'reduced-motion changes must cancel active animation frames');
 assert.match(html, /setProgress[\s\S]*?this\.used\s*=\s*safeTotal\s*-\s*this\.remaining;\s*if\s*\(this\.reduced\)[\s\S]*?this\.displayRatio\s*=\s*this\.remaining\s*\/\s*this\.total;[\s\S]*?this\.tick\(0\)/, 'reduced-motion progress updates must render a static liquid state');
+assert.match(html, /id=["']hourglass-remaining["']/, 'missing shared hourglass remaining value');
+assert.match(html, />57</, 'the shared remaining value must be 57');
+assert.match(html, /共享剩餘課程/, 'missing shared remaining caption');
+assert.match(html, /hourglass-remaining[\s\S]*?font-size=["'](?:5[0-9]|[6-9][0-9])["']/, 'the hero remaining value must be the largest numeric label');
 
 for (const reservoir of ['reservoir-berry', 'reservoir-cream', 'reservoir-mint']) {
   assert.match(html, new RegExp(`id=["']${reservoir}["']`), `missing terminal jelly reservoir: ${reservoir}`);
