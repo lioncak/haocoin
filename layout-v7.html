@@ -9,6 +9,12 @@
   html,body { margin:0; min-height:100%; background:#031127; }
   body { display:grid; place-items:start center; overflow-x:hidden; }
   .machine { display:block; width:min(100%, 700px); height:auto; background:#071c40; }
+  .bubble-rise { animation:bubble-rise 3.8s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  .energy-particle { animation:energy-run 1.7s linear infinite; }
+  .pulse-core { animation:core-pulse 2.1s ease-in-out infinite; }
+  @keyframes bubble-rise { 50% { transform:translateY(-18px) scale(1.08); opacity:.95; } }
+  @keyframes energy-run { to { stroke-dashoffset:-56; } }
+  @keyframes core-pulse { 50% { opacity:1; filter:brightness(1.32); } }
   @media (prefers-reduced-motion: reduce) { .machine * { animation:none !important; } }
 </style>
 </head>
@@ -24,6 +30,7 @@
   <linearGradient id="fuel-vertical" gradientUnits="userSpaceOnUse" x1="332" x2="368"><stop stop-color="#809300"/><stop offset=".25" stop-color="#ddff00"/><stop offset=".5" stop-color="#ffffc2"/><stop offset=".75" stop-color="#dfff00"/><stop offset="1" stop-color="#7e9300"/></linearGradient>
   <radialGradient id="joint" cx="34%" cy="22%"><stop stop-color="#e5fbff"/><stop offset=".28" stop-color="#99dcff"/><stop offset=".7" stop-color="#217fc0"/><stop offset="1" stop-color="#0c3d7d"/></radialGradient>
   <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="cyan-reservoir-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="13" result="blur"/><feFlood flood-color="#44f4ff" flood-opacity=".65" result="cyan"/><feComposite in="cyan" in2="blur" operator="in" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="24"/></filter>
   <clipPath id="hourglass-clip"><rect x="190" y="160" width="320" height="430" rx="60"/></clipPath>
 </defs>
@@ -83,20 +90,62 @@
   <path d="M350 612V768" stroke="#031127" stroke-width="78"/><path d="M350 612V768" stroke="url(#glass-vertical)" stroke-width="58"/><path d="M350 612V768" stroke="#e3ff16" stroke-width="24" filter="url(#glow)"/>
   <circle cx="350" cy="790" r="76" fill="#06254d"/><circle cx="350" cy="790" r="62" fill="url(#joint)"/><circle cx="350" cy="790" r="29" fill="url(#orange)"/><circle cx="340" cy="779" r="9" fill="#ffd19a" opacity=".75"/>
 </g>
-<!-- exactly three round transparent glass pipes: each exits screen at a different x -->
+<!-- Three persistent personal pipes; they stay independent through their reservoirs. -->
 <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path id="pipe-left" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="#031127" stroke-width="74"/>
-  <path d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="url(#glass)" stroke-width="56"/>
-  <path id="fuel-left" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1458 112 1738" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
-  <path id="pipe-right" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="#031127" stroke-width="74"/>
-  <path d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="url(#glass)" stroke-width="56"/>
-  <path id="fuel-right" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1458 589 1738" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
-  <path id="pipe-stem" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="#031127" stroke-width="76"/>
-  <path d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="url(#glass-vertical)" stroke-width="58"/>
-  <path id="fuel-stem" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1434 344 1738" stroke="#e3ff16" stroke-width="25" filter="url(#glow)"/>
+  <path id="pipe-berry" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1325 114 1410" stroke="#031127" stroke-width="74"/>
+  <path d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1325 114 1410" stroke="url(#glass)" stroke-width="56"/>
+  <path class="pulse-core" d="M300 812 C251 817 193 835 169 880 C147 920 181 1006 150 1125 C125 1225 144 1325 114 1410" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
+  <path id="pipe-mint" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1320 589 1410" stroke="#031127" stroke-width="74"/>
+  <path d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1320 589 1410" stroke="url(#glass)" stroke-width="56"/>
+  <path class="pulse-core" d="M400 812 C448 817 506 835 531 880 C553 920 519 1008 551 1130 C579 1238 547 1320 589 1410" stroke="url(#fuel)" stroke-width="23" filter="url(#glow)"/>
+  <path id="pipe-cream" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1320 344 1370" stroke="#031127" stroke-width="76"/>
+  <path d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1320 344 1370" stroke="url(#glass-vertical)" stroke-width="58"/>
+  <path class="pulse-core" d="M350 856 C331 946 380 1044 350 1150 C326 1240 378 1320 344 1370" stroke="#e3ff16" stroke-width="25" filter="url(#glow)"/>
 </g>
-<g fill="#e6ff24" filter="url(#glow)"><ellipse id="flow-left" cx="238" cy="826" rx="13" ry="8"/><ellipse id="flow-right" cx="462" cy="826" rx="13" ry="8"/><ellipse id="flow-stem" cx="350" cy="965" rx="8" ry="13"/></g>
-<path d="M-28 1530Q105 1395 182 1550" fill="none" stroke="#ff9c31" stroke-width="18" opacity=".82"/><path d="M-28 1570Q105 1435 182 1590" fill="none" stroke="#fff13a" stroke-width="12" opacity=".82"/>
+<g fill="#e6ff24" filter="url(#glow)"><ellipse id="flow-berry" cx="238" cy="826" rx="13" ry="8"/><ellipse id="flow-mint" cx="462" cy="826" rx="13" ry="8"/><ellipse id="flow-cream" cx="350" cy="965" rx="8" ry="13"/></g>
+<!-- Course valves: attached sideways to their owner pipes, never arranged as cards. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M172 994H87" stroke="#062448" stroke-width="28"/><path d="M172 994H87" stroke="url(#glass)" stroke-width="17"/><path d="M172 994H87" stroke="#eaff12" stroke-width="5"/>
+  <path d="M352 1085H432" stroke="#062448" stroke-width="28"/><path d="M352 1085H432" stroke="url(#glass)" stroke-width="17"/><path d="M352 1085H432" stroke="#eaff12" stroke-width="5"/>
+  <path d="M530 1190H617" stroke="#062448" stroke-width="28"/><path d="M530 1190H617" stroke="url(#glass)" stroke-width="17"/><path d="M530 1190H617" stroke="#eaff12" stroke-width="5"/>
+  <path d="M351 1244H430" stroke="#062448" stroke-width="28"/><path d="M351 1244H430" stroke="url(#glass)" stroke-width="17"/><path d="M351 1244H430" stroke="#eaff12" stroke-width="5"/>
+</g>
+<path id="bridge-yoga" d="M126 955 C213 914 365 958 468 1045" fill="none" stroke="#efff26" stroke-width="4" stroke-dasharray="8 10" class="energy-particle" filter="url(#glow)"/>
+<g id="module-yoga-berry" transform="translate(18 946)">
+  <rect width="142" height="82" rx="32" fill="#062448" stroke="#78eaff" stroke-width="5" filter="url(#cyan-reservoir-glow)"/><rect x="7" y="7" width="128" height="68" rx="27" fill="#1686c9" opacity=".52"/>
+  <path class="compression-seal" d="M14 70H128" stroke="url(#orange)" stroke-width="9" stroke-linecap="round"/><g id="icon-yoga" transform="translate(23 20)" fill="none" stroke="#ecff42" stroke-width="4"><circle cx="15" cy="13" r="7"/><path d="M15 21v18m-14-7h28M4 42h22"/></g><text x="57" y="31" fill="#dfffff" font-size="13" font-weight="700">8/14</text><text x="57" y="52" fill="#f3ff75" font-size="16" font-weight="800">瑜伽輪</text>
+</g>
+<g id="module-yoga-cream" transform="translate(439 1038)">
+  <rect width="150" height="82" rx="32" fill="#062448" stroke="#78eaff" stroke-width="5" filter="url(#cyan-reservoir-glow)"/><rect x="7" y="7" width="136" height="68" rx="27" fill="#1686c9" opacity=".52"/>
+  <path class="compression-seal" d="M15 70H135" stroke="url(#orange)" stroke-width="9" stroke-linecap="round"/><use href="#icon-yoga" transform="translate(0 0)"/><text x="57" y="31" fill="#dfffff" font-size="13" font-weight="700">8/14</text><text x="57" y="52" fill="#f3ff75" font-size="16" font-weight="800">瑜伽輪</text>
+</g>
+<g id="module-boxing-mint" transform="translate(530 1147)">
+  <rect width="158" height="84" rx="32" fill="#062448" stroke="#78eaff" stroke-width="5" filter="url(#cyan-reservoir-glow)"/><rect x="7" y="7" width="144" height="70" rx="27" fill="#1686c9" opacity=".52"/>
+  <path class="compression-seal" d="M15 72H142" stroke="url(#orange)" stroke-width="9" stroke-linecap="round"/><g id="icon-boxing" transform="translate(22 20)" fill="none" stroke="#ecff42" stroke-width="4"><path d="M7 13c0-8 14-11 21-4l5 9-6 15H10L4 25z"/><path d="M15 13h11M20 33v8"/></g><text x="58" y="31" fill="#dfffff" font-size="13" font-weight="700">8/18</text><text x="58" y="52" fill="#f3ff75" font-size="15" font-weight="800">拳擊有氧</text>
+</g>
+<g id="module-pilates-cream" transform="translate(438 1203)">
+  <rect width="154" height="84" rx="32" fill="#062448" stroke="#78eaff" stroke-width="5" filter="url(#cyan-reservoir-glow)"/><rect x="7" y="7" width="140" height="70" rx="27" fill="#1686c9" opacity=".52"/>
+  <path class="compression-seal" d="M15 72H138" stroke="url(#orange)" stroke-width="9" stroke-linecap="round"/><g id="icon-pilates" transform="translate(21 18)" fill="none" stroke="#ecff42" stroke-width="4"><circle cx="14" cy="10" r="6"/><path d="M15 17l10 10 13 2M23 26L9 34M9 34l-7 8"/></g><text x="57" y="31" fill="#dfffff" font-size="13" font-weight="700">8/20</text><text x="57" y="52" fill="#f3ff75" font-size="15" font-weight="800">皮拉提斯</text>
+</g>
+<!-- Large blue-glass terminal jelly reservoirs. -->
+<g id="reservoir-berry" transform="translate(36 1390)">
+  <rect x="0" y="0" width="158" height="278" rx="72" fill="#031b3c" stroke="#77eaff" stroke-width="8" filter="url(#cyan-reservoir-glow)"/>
+  <rect x="9" y="10" width="140" height="258" rx="63" fill="url(#glass)" opacity=".72"/><path d="M18 145Q47 128 77 145T140 145V246Q120 263 79 261T18 246Z" fill="url(#jelly)" opacity=".92"/>
+  <path class="specular-dual" d="M29 43V117M43 29V81" fill="none" stroke="#e5ffff" stroke-width="10" stroke-linecap="round" opacity=".78"/><path d="M134 46V112" stroke="#7cceff" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+  <path class="compression-seal" d="M22 25H136M22 250H136" stroke="url(#orange)" stroke-width="10" stroke-linecap="round"/><g id="bubble-field" class="bubble-rise" fill="none" stroke="#d9ffff" stroke-width="3" opacity=".72"><circle cx="56" cy="190" r="8"/><circle cx="103" cy="210" r="5"/><circle cx="91" cy="166" r="4"/></g>
+  <text x="79" y="70" text-anchor="middle" fill="#eaffff" font-size="18" font-weight="800">莓果重拳</text><text x="79" y="117" text-anchor="middle" fill="#f2ff37" font-size="42" font-weight="900">16</text><text x="79" y="136" text-anchor="middle" fill="#c8f7ff" font-size="12">剩餘點數</text><text x="79" y="230" text-anchor="middle" fill="#e9ffff" font-size="15">4/14　42/58</text>
+</g>
+<g id="reservoir-cream" transform="translate(263 1360)">
+  <rect width="166" height="304" rx="76" fill="#031b3c" stroke="#77eaff" stroke-width="8" filter="url(#cyan-reservoir-glow)"/><rect x="9" y="10" width="148" height="284" rx="66" fill="url(#glass)" opacity=".72"/><path d="M18 158Q48 138 83 156T148 156V272Q124 287 82 286T18 272Z" fill="url(#jelly)" opacity=".92"/>
+  <path class="specular-dual" d="M30 48V127M44 30V84" fill="none" stroke="#e5ffff" stroke-width="10" stroke-linecap="round" opacity=".78"/><path d="M141 48V124" stroke="#7cceff" stroke-width="7" stroke-linecap="round" opacity=".68"/><path class="compression-seal" d="M24 26H142M24 274H142" stroke="url(#orange)" stroke-width="10" stroke-linecap="round"/>
+  <g class="bubble-rise" fill="none" stroke="#d9ffff" stroke-width="3" opacity=".72"><circle cx="57" cy="203" r="9"/><circle cx="112" cy="234" r="5"/><circle cx="100" cy="178" r="4"/></g><text x="83" y="76" text-anchor="middle" fill="#eaffff" font-size="18" font-weight="800">奶油鐵手</text><text x="83" y="126" text-anchor="middle" fill="#f2ff37" font-size="44" font-weight="900">18</text><text x="83" y="145" text-anchor="middle" fill="#c8f7ff" font-size="12">剩餘點數</text><text x="83" y="254" text-anchor="middle" fill="#e9ffff" font-size="15">4/14　40/58</text>
+</g>
+<g id="reservoir-mint" transform="translate(506 1390)">
+  <rect width="158" height="278" rx="72" fill="#031b3c" stroke="#77eaff" stroke-width="8" filter="url(#cyan-reservoir-glow)"/><rect x="9" y="10" width="140" height="258" rx="63" fill="url(#glass)" opacity=".72"/><path d="M18 138Q47 120 79 138T140 138V246Q120 263 79 261T18 246Z" fill="url(#jelly)" opacity=".92"/>
+  <path class="specular-dual" d="M29 43V117M43 29V81" fill="none" stroke="#e5ffff" stroke-width="10" stroke-linecap="round" opacity=".78"/><path d="M134 46V112" stroke="#7cceff" stroke-width="7" stroke-linecap="round" opacity=".68"/><path class="compression-seal" d="M22 25H136M22 250H136" stroke="url(#orange)" stroke-width="10" stroke-linecap="round"/>
+  <g class="bubble-rise" fill="none" stroke="#d9ffff" stroke-width="3" opacity=".72"><circle cx="55" cy="183" r="8"/><circle cx="105" cy="213" r="5"/><circle cx="91" cy="157" r="4"/></g><text x="79" y="70" text-anchor="middle" fill="#eaffff" font-size="18" font-weight="800">薄荷軟骨</text><text x="79" y="117" text-anchor="middle" fill="#f2ff37" font-size="42" font-weight="900">23</text><text x="79" y="136" text-anchor="middle" fill="#c8f7ff" font-size="12">剩餘點數</text><text x="79" y="230" text-anchor="middle" fill="#e9ffff" font-size="15">5/14　35/58</text>
+</g>
+<path d="M-28 1688Q105 1622 182 1692" fill="none" stroke="#ff9c31" stroke-width="18" opacity=".46"/><path d="M-28 1698Q105 1632 182 1702" fill="none" stroke="#fff13a" stroke-width="12" opacity=".46"/>
 </svg>
 <script>
   class JellyHourglass {
@@ -115,7 +164,7 @@
       this.bottomMass = svg.querySelector('#jelly-bottom-mass');
       this.neck = svg.querySelector('#jelly-neck');
       this.droplet = svg.querySelector('#neck-droplet');
-      this.flows = ['#flow-left', '#flow-right', '#flow-stem'].map((id) => svg.querySelector(id));
+      this.flows = ['#flow-berry', '#flow-mint', '#flow-cream'].map((id) => svg.querySelector(id));
       this.tick = this.tick.bind(this);
       this.handleReducedMotion = this.handleReducedMotion.bind(this);
       this.motionQuery.addEventListener('change', this.handleReducedMotion);
