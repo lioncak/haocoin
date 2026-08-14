@@ -1,0 +1,6 @@
+# 真名對照表跟原始紀錄只留在本機，不要推上公開 repo
+names.local.json
+tools/raw.local.txt
+*.local.txt
+*.local.json
+.DS_Store
