@@ -3,21 +3,17 @@ import { readFile } from 'node:fs/promises';
 
 const html = await readFile(new URL('../layout-v7.html', import.meta.url), 'utf8');
 
-for (const id of ['pipe-berry', 'pipe-cream', 'pipe-mint']) {
-  assert.match(html, new RegExp(`id=["']${id}["']`), `missing ${id}`);
+const pipeIds = [...html.matchAll(/id=["'](pipe-[^"']+)["']/g)].map((match) => match[1]);
+assert.deepEqual(pipeIds.sort(), ['pipe-left', 'pipe-right', 'pipe-stem'], 'the distributor must expose exactly three glass pipe paths');
+
+for (const id of ['jelly-top-wave', 'jelly-bottom-wave', 'hourglass-shell', 'background-pipe-left', 'background-pipe-right', 'ribbon-orange', 'ribbon-yellow']) {
+  assert.match(html, new RegExp(`id=["']${id}["']`), `missing visual layer: ${id}`);
 }
 
-for (const id of ['summary-berry', 'summary-cream', 'summary-mint']) {
-  assert.match(html, new RegExp(`id=["']${id}["']`), `missing ${id}`);
-}
-
-for (const text of ['57', '瑜伽輪', '8-14', '拳擊有氧', '8-18', '皮拉提斯', '8-20']) {
-  assert.match(html, new RegExp(text), `missing course content: ${text}`);
-}
-
-for (const text of ['莓果重拳', '奶油鐵手', '薄荷軟骨', '16', '18', '23', '4/14', '5/14', '42/58', '40/58', '35/58']) {
-  assert.match(html, new RegExp(text), `missing personal summary content: ${text}`);
-}
-
+assert.match(html, /requestAnimationFrame/, 'the jelly component must run a frame loop');
+assert.match(html, /(?:this\.)?remaining\s*=/, 'missing remaining state');
+assert.match(html, /(?:this\.)?total\s*=/, 'missing total state');
+assert.match(html, /(?:this\.)?used\s*=/, 'missing used state');
+assert.match(html, /Math\.sin/, 'liquid surface must be computed from sine waves');
+assert.match(html, /remaining\s*\/\s*(?:this\.)?total|(?:this\.)?remaining\s*\/\s*(?:this\.)?total/, 'missing remaining-to-total liquid level mapping');
 assert.match(html, /prefers-reduced-motion/, 'missing reduced-motion handling');
-assert.match(html, /<svg[\s>]/, 'missing inline SVG pipeline');
