@@ -106,7 +106,9 @@
       this.total = 58;
       this.used = this.total - this.remaining;
       this.displayRatio = this.remaining / this.total;
-      this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+      this.reduced = this.motionQuery.matches;
+      this.rafId = null;
       this.top = svg.querySelector('#jelly-top-wave');
       this.bottom = svg.querySelector('#jelly-bottom-wave');
       this.topMass = svg.querySelector('#jelly-top-mass');
@@ -115,12 +117,29 @@
       this.droplet = svg.querySelector('#neck-droplet');
       this.flows = ['#flow-left', '#flow-right', '#flow-stem'].map((id) => svg.querySelector(id));
       this.tick = this.tick.bind(this);
-      if (this.reduced) this.tick(0); else requestAnimationFrame(this.tick);
+      this.handleReducedMotion = this.handleReducedMotion.bind(this);
+      this.motionQuery.addEventListener('change', this.handleReducedMotion);
+      if (this.reduced) this.tick(0); else this.start();
     }
     setProgress(remaining, total = this.total) {
-      this.remaining = Math.max(0, Math.min(remaining, total));
-      this.total = total;
-      this.used = total - this.remaining;
+      const safeTotal = Number.isFinite(total) && total > 0 ? total : (Number.isFinite(this.total) && this.total > 0 ? this.total : 1);
+      const safeRemaining = Number.isFinite(remaining) ? remaining : this.remaining;
+      this.total = safeTotal;
+      this.remaining = Math.max(0, Math.min(Number.isFinite(safeRemaining) ? safeRemaining : 0, safeTotal));
+      this.used = safeTotal - this.remaining;
+    }
+    start() {
+      if (!this.reduced && this.rafId === null) this.rafId = requestAnimationFrame(this.tick);
+    }
+    handleReducedMotion(event) {
+      this.reduced = event.matches;
+      if (this.reduced) {
+        if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+        this.tick(0);
+      } else {
+        this.start();
+      }
     }
     wavePath(y, amplitude, phase) {
       let d = `M 230 ${y}`;
@@ -131,7 +150,9 @@
       return d;
     }
     tick(ms) {
-      const target = this.remaining / this.total;
+      this.rafId = null;
+      const rawRatio = Number.isFinite(this.remaining) && Number.isFinite(this.total) && this.total > 0 ? this.remaining / this.total : 0;
+      const target = Math.max(0, Math.min(rawRatio, 1));
       this.displayRatio += (target - this.displayRatio) * .035;
       const phase = ms / 700;
       const topY = 250 + (1 - this.displayRatio) * 28;
@@ -150,7 +171,7 @@
         node.setAttribute('opacity', (.65 + Math.sin(phase + index) * .35).toFixed(2));
         node.setAttribute('transform', index === 0 ? `translate(${offset} 0)` : index === 1 ? `translate(${-offset} 0)` : `translate(0 ${offset})`);
       });
-      if (!this.reduced) requestAnimationFrame(this.tick);
+      if (!this.reduced) this.start();
     }
   }
   window.jellyHourglass = new JellyHourglass(document.querySelector('.machine'));

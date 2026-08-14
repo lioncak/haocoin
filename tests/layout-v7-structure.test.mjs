@@ -17,3 +17,6 @@ assert.match(html, /(?:this\.)?used\s*=/, 'missing used state');
 assert.match(html, /Math\.sin/, 'liquid surface must be computed from sine waves');
 assert.match(html, /remaining\s*\/\s*(?:this\.)?total|(?:this\.)?remaining\s*\/\s*(?:this\.)?total/, 'missing remaining-to-total liquid level mapping');
 assert.match(html, /prefers-reduced-motion/, 'missing reduced-motion handling');
+assert.match(html, /Number\.isFinite/, 'setProgress must reject non-finite progress inputs');
+assert.match(html, /addEventListener\(['"]change['"]/, 'reduced-motion preference changes must be observed');
+assert.match(html, /cancelAnimationFrame/, 'reduced-motion changes must cancel active animation frames');
