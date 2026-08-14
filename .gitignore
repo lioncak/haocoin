@@ -4,3 +4,4 @@ tools/raw.local.txt
 *.local.txt
 *.local.json
 .DS_Store
+.worktrees/
