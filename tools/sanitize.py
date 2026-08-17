@@ -47,6 +47,12 @@ def main():
     src = sys.argv[1] if len(sys.argv) > 1 else None
     text = pathlib.Path(src).read_text(encoding="utf-8") if src else sys.stdin.read()
 
+    # 空輸入通常代表上游（例如自動抓資料的腳本）失敗了，不是真的要清空 data.txt。
+    # 2026-08-17 實際發生過一次：scrape 那支因為缺套件而炸掉、印出空字串，
+    # 這裡不擋的話就會直接把 39 筆紀錄的 data.txt 蓋成 0 筆。
+    if not text.strip():
+        sys.exit("輸入是空的，不寫入 data.txt——這通常代表資料來源那邊出錯了，不是真的沒資料。")
+
     mapping = load_map()
     result, unknown = sanitize(text, mapping)
 
@@ -56,8 +62,11 @@ def main():
             + "、".join(sorted(unknown))
         )
 
-    OUT_FILE.write_text(result, encoding="utf-8")
     rows = sum(1 for line in result.splitlines() if "Point" in line)
+    if rows == 0:
+        sys.exit("解析出來 0 筆點數紀錄，這個帳號不可能真的沒紀錄——不寫入，資料來源那邊八成格式跑掉了。")
+
+    OUT_FILE.write_text(result, encoding="utf-8")
     print(f"寫入 {OUT_FILE}（{rows} 筆點數紀錄）")
 
 

@@ -3,5 +3,8 @@ names.local.json
 tools/raw.local.txt
 *.local.txt
 *.local.json
+*.local.log
 .DS_Store
 .worktrees/
+__pycache__/
+.venv/
