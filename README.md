@@ -48,3 +48,12 @@ cookie expires or the scrape returns nothing.
 ```bash
 python3 -m http.server 8765
 ```
+
+## Credits
+
+Spring physics constants in `index.html` (press/tilt/drag damping) are taken
+from [jelly-org/ui](https://github.com/jelly-org/ui)'s `src/core/config.ts`
+(MIT, © bmson) — the spring implementation itself is original, only the
+tuned numeric values are reused. The loading shimmer is a from-scratch CSS
+reimplementation of the technique in
+[react-content-loader](https://github.com/danilowoz/react-content-loader) (MIT).

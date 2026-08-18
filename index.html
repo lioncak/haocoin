@@ -148,8 +148,7 @@ body::after{
 
 /* ── 課程紀錄（點卡片展開）───────────────── */
 /* grid-row 0fr→1fr 這招：容器自己知道內容多高，JS 不用再量 scrollHeight，
-   字型延遲載入或視窗縮放都不會讓「展開高度」跟內容對不上。
-   （見 design-reference/01-interaction/grid-height-accordion.md） */
+   字型延遲載入或視窗縮放都不會讓「展開高度」跟內容對不上。 */
 .log-wrap{position:relative;z-index:2;display:grid;grid-template-rows:0fr;will-change:grid-template-rows}
 .log{min-height:0;overflow:hidden}
 .log-body{padding-top:13px;margin-top:15px;border-top:1.5px dashed rgba(30,58,69,.22)}
@@ -231,7 +230,8 @@ body::after{
 /* data.txt 抓超過 150ms 才會出現（見 boot 那段的 setTimeout）——
    本機/GitHub Pages 通常瞬間抓完，這樣快的那次不會閃一下骨架又消失。
    形狀直接照 .jelly 的圓角＋卡片高度湊，不用另外刻 SVG。
-   （見 design-reference/01-interaction/svg-shimmer-skeleton.md） */
+   Shimmer 手法參考 danilowoz/react-content-loader（MIT）的技巧，這裡重寫成
+   純 CSS background-position 動畫，沒有用到它的原始碼。 */
 .skel{display:none}
 body.loading #content{display:none}
 body.loading .skel{display:flex;flex-direction:column;gap:12px}
@@ -459,9 +459,12 @@ function build(text){
 
 /* ══════════════════════════════════════════════
    2. 果凍物理
-      一個共用 rAF loop，彈簧靜止就休眠（jelly-org/ui `src/core/engine.ts` 的作法）
-      彈簧常數取自 `src/core/config.ts`：pressSpring 76 / pressDamping 13
-      → ζ≈.75，壓下去放開只回彈一次就收，不是卡通式亂彈
+      這裡的彈簧引擎跟下面用到的幾組常數（PRESS_K/HOLD_C、tilt 的 115/18、
+      Tube.pull 的 96/17）是照 jelly-org/ui（github.com/jelly-org/ui，MIT
+      License，作者 bmson）的 src/core/engine.ts 跟 src/core/config.ts 裡
+      的數值抄的——不是用他們的套件或原始碼，是自己重寫一份 Spring 實作，
+      套用他們調好的彈簧常數。ζ≈.75，壓下去放開只回彈一次就收，
+      不是卡通式亂彈。
    ══════════════════════════════════════════════ */
 var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -508,8 +511,7 @@ var Engine = {
 addEventListener("visibilitychange", function(){ if (document.hidden) Engine.flush(); });
 
 /* ── 按壓：擠壓保體積 + 內容物跟著波浪抖 ─── */
-/* 壓住時用 jelly-org 的 pressDamping 13（ζ≈.75，不要在手指下面亂晃）；
-   一放開把阻尼降到 7（ζ≈.4），才會 Q 彈好幾下才停。                     */
+/* 壓住時阻尼 13（不要在手指下面亂晃）；一放開降到 7（ζ≈.4），才會 Q 彈好幾下才停。 */
 var PRESS_K = 76, HOLD_C = 13, BOUNCE_C = 7;
 
 function makePressable(el, opt){
