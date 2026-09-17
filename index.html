@@ -32,6 +32,7 @@
   --berry:#F5AB9A;   --berry-in:#D6402B;
   --butter:#F8CE83;  --butter-in:#D9840F;
   --mint:#9DD3BB;    --mint-in:#18906A;
+  --mango:#B7C6F0;   --mango-in:#4C5FC7;
 
   --num:"Fredoka",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
   --ui:"Fredoka","PingFang TC",-apple-system,"Noto Sans TC",system-ui,sans-serif;
@@ -133,6 +134,24 @@ body::after{
 
 /* ── 個人統計：一人一塊糖 ─────────────────── */
 .people{display:flex;flex-direction:column;gap:12px;margin-bottom:26px}
+/* 個人統計併進同一塊總統計果凍裡（同方案不拆成兩塊藍色），只補內嵌標題跟收尾間距 */
+.hero .sec{position:relative;z-index:2;margin:18px 2px 11px}
+.hero .sec h2{color:#EAF4F8;opacity:.75}
+.hero .sec::after{background:repeating-conic-gradient(rgba(255,255,255,.16) 0 25%,transparent 0 50%) 0 0/8px 8px}
+.hero .people{position:relative;z-index:2;margin-bottom:0}
+
+/* 個人統計收合鈕：跟卡片裡的「課程」鈕同款式，換成藍底配色 */
+.sec-toggle{
+  margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+  border:0;padding:5px 11px;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.18);color:#EAF4F8;
+  font:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;
+}
+.sec-toggle svg{width:9px;height:9px;transition:transform .34s var(--fx)}
+.sec-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.people-wrap{position:relative;z-index:2;display:grid;grid-template-rows:1fr;transition:grid-template-rows .42s var(--fx)}
+.people-wrap-inner{min-height:0;overflow:hidden}
+@media (prefers-reduced-motion:reduce){.people-wrap{transition:none}}
 .card{background:var(--k);color:var(--chip-ink);padding:17px 19px 16px}
 .card-top{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-bottom:13px}
 .card-top h3{margin:0;font-size:15px;font-weight:600;letter-spacing:.06em}
@@ -264,22 +283,7 @@ body.loading .skel{display:flex;flex-direction:column;gap:12px}
   </header>
 
   <div id="content">
-    <div class="sec rise" style="--i:1"><h2>總統計</h2></div>
-    <section class="hero jelly rise" style="--i:2">
-      <div class="hero-head">
-        <b class="n" id="t-left">0</b>
-        <div class="cap"><span>剩餘點數</span><em id="t-quota">—</em></div>
-      </div>
-      <div class="tube" id="tube-total"></div>
-      <div class="legend" id="legend"></div>
-      <div class="chips">
-        <div class="chip"><b class="n" id="t-class">0</b><span>可上堂數</span></div>
-        <div class="chip"><b class="n" id="t-used">0</b><span>已用點數</span></div>
-      </div>
-    </section>
-
-    <div class="sec rise" style="--i:3"><h2>個人統計</h2></div>
-    <div class="people" id="people"></div>
+    <div id="plans"></div>
 
     <div id="next-slot"></div>
 
@@ -287,7 +291,6 @@ body.loading .skel{display:flex;flex-direction:column;gap:12px}
     <nav class="days" id="sched-days"></nav>
     <div class="sched" id="sched-list"></div>
 
-    <p class="foot" id="foot"></p>
     <p class="foot">課表照活動圖片手動轉錄，教練暱稱／課程副標題最容易看錯，有錯麻煩直接說；<em>進階</em>是課程副標題含「中階／進階」判斷的，好幣數未標一律當 4 好幣，少數課程實際是 5／7 好幣，以現場公告為準。</p>
   </div>
 
@@ -348,7 +351,22 @@ var UNIT = 4;                        // 一堂課的標準點數
 var TONE = [                         // 暱稱關鍵字 → 識別色（底色 / 重點色）
   { test:/莓果/, bg:"--berry",  in:"--berry-in"  },
   { test:/薄荷/, bg:"--mint",   in:"--mint-in"   },
-  { test:/奶油/, bg:"--butter", in:"--butter-in" }
+  { test:/奶油/, bg:"--butter", in:"--butter-in" },
+  { test:/芒果/, bg:"--mango",  in:"--mango-in"  }
+];
+
+// 兩份合約各自的點數池：舊方案是原本三人的合約，新方案是後來加購、
+// 四人平分的合約。每個人的紀錄目前歸在哪個方案不能從單筆交易看出來
+// （17FIT 後台自己決定扣哪份合約的點），所以用 txMembers 明講「這個人
+// 現在的紀錄算在這裡」；splitMembers 才是拿來平分點數的分母。
+var PLANS = [
+  { key:"old", label:"4/28 方案", contract:"242ddb80bc",
+    txMembers:   ["莓果重拳","奶油鐵手","薄荷軟骨"],
+    splitMembers:["莓果重拳","奶油鐵手","薄荷軟骨"] },
+  { key:"new", label:"7/8 方案", contract:"48ef8d64ec",
+    txMembers:   ["芒果飛膝"],
+    splitMembers:["莓果重拳","奶油鐵手","薄荷軟骨","芒果飛膝"],
+    bonusMember: "芒果飛膝" }   // 開通禮 6 點是她自己的新生禮，不進四人平分的池子
 ];
 var $ = function(id){ return document.getElementById(id); };
 var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){
@@ -394,14 +412,24 @@ function detail(reason){
   };
 }
 
-function build(text){
-  var p = parse(text), people = new Map(), slots = new Map(), pool = 0;
+function buildPlan(txs, plan){
+  var people = new Map();
+  plan.splitMembers.forEach(function(name){
+    people.set(name, { name:name, spent:0, refunded:0, attended:0, bonus:0 });
+  });
+  var slots = new Map(), pool = 0;
 
-  p.txs.forEach(function(tx){
+  txs.forEach(function(tx){
     var d = detail(tx.reason);
-    if (!tx.user){ if (tx.change > 0) pool += tx.change; return; }
+    if (!tx.user){
+      if (tx.change > 0 && d.id === plan.contract){
+        if (d.kind === "gift" && plan.bonusMember) people.get(plan.bonusMember).bonus += tx.change;
+        else pool += tx.change;
+      }
+      return;
+    }
+    if (plan.txMembers.indexOf(tx.user) === -1) return;   // 這個人的紀錄不算在這個方案裡
 
-    if (!people.has(tx.user)) people.set(tx.user, { name:tx.user, spent:0, refunded:0, attended:0 });
     var per = people.get(tx.user);
     if (tx.change < 0) per.spent += -tx.change; else per.refunded += tx.change;
 
@@ -435,8 +463,8 @@ function build(text){
     per.in      = t.in;
     per.log     = all.filter(function(s){ return s.user === per.name && s.date; })
                      .sort(function(a,b){ return (b.date + b.time).localeCompare(a.date + a.time); });
-    per.used    = per.spent - per.refunded;      // 已用點數
-    per.quota   = pool / n;                       // 平分後的個人額度
+    per.used    = per.spent - per.refunded;      // 已用點數（真實花費，開通禮不算在這裡）
+    per.quota   = pool / n + per.bonus;           // 平分後的個人額度，加上自己的開通禮
     per.left    = per.quota - per.used;           // 剩餘點數
     per.classes = Math.floor(per.left / UNIT);    // 可上堂數
     per.rest    = per.left - per.classes * UNIT;  // 湊不成一堂的零頭
@@ -447,14 +475,20 @@ function build(text){
   });
 
   var used = list.reduce(function(a,b){ return a + b.used; }, 0);
-  // 總可上堂數＝三個人各自能約的堂數相加。點數是分開算的，
-  // 不能把 57 湊成一堆再除以 4（那會多算出一堂沒人約得到的課）。
+  // 總可上堂數＝每個人各自能約的堂數相加。點數是分開算的，
+  // 不能把剩餘點數湊成一堆再除（那會多算出一堂沒人約得到的課）。
   var classes = list.reduce(function(a,b){ return a + b.classes; }, 0);
 
   return {
+    key:plan.key, label:plan.label,
     people:list, slots:all, pool:pool, quota:pool / n,
-    used:used, left:pool - used, classes:classes, expiry:p.expiry
+    used:used, left:pool - used, classes:classes
   };
+}
+
+function build(text){
+  var p = parse(text);
+  return { plans: PLANS.map(function(pl){ return buildPlan(p.txs, pl); }), expiry:p.expiry };
 }
 
 /* ══════════════════════════════════════════════
@@ -749,27 +783,15 @@ function logRows(log){
   return out;
 }
 
-function render(d){
-  $("exp").textContent     = d.expiry ? d.expiry.slice(5).replace("-","/") : "—";
-  $("t-quota").textContent = "共 " + d.pool + " 點 · 每人 " + d.quota;
+/* 一個方案的整塊：總統計 hero ＋ 個人統計卡片 ＋ 購買說明 */
+function renderPlan(plan, idx){
+  var base = idx * 20;   // 每個方案的進場動畫延遲分開算，不要跟別的方案卡片撞在一起
 
-  countUp($("t-left"),  d.left);
-  countUp($("t-class"), d.classes);
-  countUp($("t-used"),  d.used);
-
-  /* 總量管：三個人的剩餘點數並排，不合流 */
-  new Tube($("tube-total"), {
-    max:  d.pool,
-    h:    64,
-    segs: d.people.map(function(p){ return { v:p.left, color:"var(" + p.in + ")" }; })
-  });
-
-  $("legend").innerHTML = d.people.map(function(p){
+  var legend = plan.people.map(function(p){
     return '<i style="--k:var(' + p.in + ')">' + esc(p.name) + ' <b>' + p.left + '</b></i>';
   }).join("");
 
-  /* 個人卡：一人一塊糖，一格＝一堂課，點開看課程紀錄 */
-  $("people").innerHTML = d.people.map(function(p, n){
+  var cards = plan.people.map(function(p, n){
     var cells = "";
     for (var i = 0; i < p.cells; i++){
       var w = i < p.classes ? 100 : (i === p.classes ? p.rest / UNIT * 100 : 0);
@@ -778,7 +800,7 @@ function render(d){
     var tally = '<span>已上 ' + p.done + '</span>' +
                 (p.soon    ? '<span>待上 ' + p.soon + '</span>' : '') +
                 (p.dropped ? '<span>取消 ' + p.dropped + '</span>' : '');
-    return '<article class="card jelly rise" style="--k:var(' + p.bg + ');--kin:var(' + p.in + ');--i:' + (n + 4) + '">' +
+    return '<article class="card jelly rise" style="--k:var(' + p.bg + ');--kin:var(' + p.in + ');--i:' + (base + 4 + n) + '">' +
       '<div class="card-top"><h3>' + esc(p.name) + '</h3>' +
         '<button class="more" type="button" aria-expanded="false">課程' +
           '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2 5 7 9 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
@@ -794,36 +816,88 @@ function render(d){
       '</div></div></div></article>';
   }).join("");
 
-  [].forEach.call($("people").children, function(card){
+  return '<div class="sec rise" style="--i:' + (base + 1) + '"><h2>總統計 · ' + esc(plan.label) + '</h2></div>' +
+    '<section class="hero jelly rise" style="--i:' + (base + 2) + '">' +
+      '<div class="hero-head">' +
+        '<b class="n" id="t-left-' + plan.key + '">0</b>' +
+        '<div class="cap"><span>剩餘點數</span><em id="t-quota-' + plan.key + '">—</em></div>' +
+      '</div>' +
+      '<div class="tube" id="tube-total-' + plan.key + '"></div>' +
+      '<div class="legend">' + legend + '</div>' +
+      '<div class="chips">' +
+        '<div class="chip"><b class="n" id="t-class-' + plan.key + '">0</b><span>可上堂數</span></div>' +
+        '<div class="chip"><b class="n" id="t-used-' + plan.key + '">0</b><span>已用點數</span></div>' +
+      '</div>' +
+      '<div class="sec"><h2>個人統計 · ' + esc(plan.label) + '</h2>' +
+        '<button class="sec-toggle" type="button" aria-expanded="true">收合' +
+          '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2 5 7 9 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="people-wrap"><div class="people-wrap-inner"><div class="people">' + cards + '</div></div></div>' +
+    '</section>' +
+    '<p class="foot">共買 <b>' + plan.pool + '</b> 點，' + plan.people.length + ' 人平分，每人 <b>' + plan.quota +
+      '</b> 點 · 一堂 <b>' + UNIT + '</b> 點 · 一格＝一堂</p>';
+}
+
+function render(d){
+  $("exp").textContent = d.expiry ? d.expiry.slice(5).replace("-","/") : "—";
+
+  $("plans").innerHTML = d.plans.map(renderPlan).join("");
+
+  d.plans.forEach(function(plan){
+    $("t-quota-" + plan.key).textContent = "共 " + plan.pool + " 點 · 每人 " + plan.quota;
+    countUp($("t-left-"  + plan.key), plan.left);
+    countUp($("t-class-" + plan.key), plan.classes);
+    countUp($("t-used-"  + plan.key), plan.used);
+
+    /* 總量管：這個方案裡每個人的剩餘點數並排，不合流 */
+    new Tube($("tube-total-" + plan.key), {
+      max:  plan.pool,
+      h:    64,
+      segs: plan.people.map(function(p){ return { v:p.left, color:"var(" + p.in + ")" }; })
+    });
+  });
+
+  [].forEach.call(document.querySelectorAll(".people .card"), function(card){
     var body   = makePressable(card);
     var toggle = makeExpander(card, body);
     // 卡片本身也能點開，但點在已展開的清單裡不算（不然滑一下就收起來了）
     card.addEventListener("click", function(e){ if (!e.target.closest(".log-wrap")) toggle(); });
   });
 
-  /* 下一堂 */
+  /* 個人統計整區收合：跟課程紀錄同一招 grid-row，只是收合對象換成整個卡片列表 */
+  [].forEach.call(document.querySelectorAll(".sec-toggle"), function(btn){
+    var wrap = btn.closest(".sec").nextElementSibling;
+    btn.addEventListener("click", function(){
+      var open = btn.getAttribute("aria-expanded") !== "false";
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+      btn.firstChild.textContent = open ? "展開" : "收合";
+      wrap.style.gridTemplateRows = open ? "0fr" : "1fr";
+    });
+  });
+
+  /* 下一堂：兩個方案的課合在一起看，誰最先要上課就顯示誰 */
+  var people = [].concat.apply([], d.plans.map(function(pl){ return pl.people; }));
+  var slots  = [].concat.apply([], d.plans.map(function(pl){ return pl.slots;  }));
   var today = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0,10);
-  var up = d.slots.filter(function(s){ return !s.cancelled && s.date && s.date >= today; })
-                  .sort(function(a,b){ return (a.date + a.time).localeCompare(b.date + b.time); });
+  var up = slots.filter(function(s){ return !s.cancelled && s.date && s.date >= today; })
+                .sort(function(a,b){ return (a.date + a.time).localeCompare(b.date + b.time); });
   if (up.length){
     var f = up[0];
     var same = up.filter(function(s){ return s.date === f.date && s.time === f.time; });
     var who = same.map(function(s){
-      var p = d.people.filter(function(x){ return x.name === s.user; })[0];
+      var p = people.filter(function(x){ return x.name === s.user; })[0];
       return '<i style="--k:var(' + (p ? p.in : "--ink-3") + ')"></i>';
     }).join("");
     var md = f.date.slice(5).split("-");
     $("next-slot").innerHTML =
-      '<div class="sec rise" style="--i:7"><h2>下一堂</h2></div>' +
-      '<div class="next jelly rise" style="--i:8">' +
+      '<div class="sec rise" style="--i:44"><h2>下一堂</h2></div>' +
+      '<div class="next jelly rise" style="--i:45">' +
         '<div class="day"><b>' + (+md[1]) + '</b><span>' + (+md[0]) + '月</span></div>' +
         '<div class="what"><b>' + esc(f.title || "課程") + '</b>' +
           '<span>' + f.time + ' · ' + same.length + ' 人同堂 · 各 ' + UNIT + ' 點</span></div>' +
         '<div class="who">' + who + '</div></div>';
   }
-
-  $("foot").innerHTML = '共買 <b>' + d.pool + '</b> 點，三人平分，每人 <b>' + d.quota +
-                        '</b> 點 · 一堂 <b>' + UNIT + '</b> 點 · 一格＝一堂';
 
   // 個人卡在上面已經接過了，這裡只補其他果凍
   document.querySelectorAll(".hero, .next").forEach(function(el){ makePressable(el); });
