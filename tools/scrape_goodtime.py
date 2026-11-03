@@ -79,7 +79,8 @@ def scrape():
         context.add_cookies(cookies)
         page = context.new_page()
 
-        page.goto(MEMBERSHIP_URL, wait_until="networkidle")
+        page.goto(MEMBERSHIP_URL, wait_until="load", timeout=60000)
+        page.wait_for_timeout(4000)  # networkidle 偶爾永遠等不到，改成 load 後固定等一下
 
         body_text = page.inner_text("body")
         if any(marker in body_text or marker in page.url for marker in LOGIN_MARKERS):
@@ -102,17 +103,21 @@ def scrape():
             detail_toggles.nth(i).click()
         page.wait_for_timeout(800)  # 展開動畫 + 資料渲染
 
-        # 逐一檢查頁面上每個 <table>，欄位表頭同時有 Date/Reason/Change
-        # 才當作交易紀錄表（總覽卡片那個 table 表頭不是這個組合，會被跳過）。
+        # 頁面的表格是巢狀的（外層表格會把內層每份合約的列重複算進去），
+        # 只取最內層、有 Reason 表頭的表格＝每份合約一張。每張表前面先印一行
+        # 「@@contract<TAB>合約id」，讓 app 知道後面那些列是扣哪份合約的點。
         tables = page.locator("table")
         found_records_table = False
         for ti in range(tables.count()):
             table = tables.nth(ti)
+            if table.locator("table").count() > 0:
+                continue
             header_text = norm(table.inner_text())
             if not ("Date" in header_text and "Reason" in header_text and "Change" in header_text):
                 continue
             found_records_table = True
             rows = table.locator("tbody tr")
+            recs = []
             for ri in range(rows.count()):
                 cells = rows.nth(ri).locator("td")
                 if cells.count() < 4:
@@ -123,7 +128,10 @@ def scrape():
                 user = norm(cells.nth(3).inner_text())
                 if not re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", date):
                     continue  # 不是資料列（可能是合併儲存格的裝飾列），跳過
-                lines.append(f"{date}\t{reason}\t{change}\t{user}")
+                recs.append(f"{date}\t{reason}\t{change}\t{user}")
+            buy = next((re.search(r"<(\w+)>", r.split("\t")[1]) for r in recs if r.split("\t")[1].startswith("購買")), None)
+            lines.append("@@contract\t" + (buy.group(1) if buy else f"unknown{ti}"))
+            lines.extend(recs)
 
         browser.close()
 

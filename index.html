@@ -33,6 +33,7 @@
   --butter:#F8CE83;  --butter-in:#D9840F;
   --mint:#9DD3BB;    --mint-in:#18906A;
   --mango:#B7C6F0;   --mango-in:#4C5FC7;
+  --grape:#DDBDEB;   --grape-in:#8A3FB3;
 
   --num:"Fredoka",ui-rounded,"SF Pro Rounded",system-ui,sans-serif;
   --ui:"Fredoka","PingFang TC",-apple-system,"Noto Sans TC",system-ui,sans-serif;
@@ -352,31 +353,33 @@ var TONE = [                         // 暱稱關鍵字 → 識別色（底色 /
   { test:/莓果/, bg:"--berry",  in:"--berry-in"  },
   { test:/薄荷/, bg:"--mint",   in:"--mint-in"   },
   { test:/奶油/, bg:"--butter", in:"--butter-in" },
-  { test:/芒果/, bg:"--mango",  in:"--mango-in"  }
+  { test:/芒果/, bg:"--mango",  in:"--mango-in"  },
+  { test:/葡萄/, bg:"--grape",  in:"--grape-in"  }
 ];
 
-// 兩份合約各自的點數池：舊方案是原本三人的合約，新方案是後來加購、
-// 四人平分的合約。每個人的紀錄目前歸在哪個方案不能從單筆交易看出來
-// （17FIT 後台自己決定扣哪份合約的點），所以用 txMembers 明講「這個人
-// 現在的紀錄算在這裡」；splitMembers 才是拿來平分點數的分母。
+// 每份合約一個方案。data.txt 裡每張合約的紀錄前面有一行「@@contract 合約id」，
+// 紀錄扣哪份合約看這個標記，不用再靠人名猜。splitMembers 是平分點數的分母；
+// owner 是一個人專用的合約，別人用到的點數算「借出」，之後要還錢給他。
 var PLANS = [
-  { key:"old", label:"4/28 方案", contract:"242ddb80bc",
-    txMembers:   ["莓果重拳","奶油鐵手","薄荷軟骨"],
+  { key:"a", label:"4/28 方案", contract:"242ddb80bc",
     splitMembers:["莓果重拳","奶油鐵手","薄荷軟骨"] },
-  { key:"new", label:"7/8 方案", contract:"48ef8d64ec",
-    txMembers:   ["芒果飛膝"],
+  { key:"b", label:"7/8 方案", contract:"48ef8d64ec",
     splitMembers:["莓果重拳","奶油鐵手","薄荷軟骨","芒果飛膝"],
-    bonusMember: "芒果飛膝" }   // 開通禮 6 點是她自己的新生禮，不進四人平分的池子
+    bonusMember: "芒果飛膝" },   // 開通禮 6 點是她自己的新生禮，不進四人平分的池子
+  { key:"c", label:"9/17 方案", contract:"0ecf45f40f",
+    splitMembers:["葡萄劈腿"], owner:"葡萄劈腿" }
 ];
 var $ = function(id){ return document.getElementById(id); };
 var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
 
 function parse(text){
-  var txs = [], expiry = null, expStamp = "";
+  var txs = [], expiry = null, expStamp = "", contract = null;
   text.split(/\r?\n/).forEach(function(raw){
     var line = raw.replace(/ /g," ").trim();
     if (!line) return;
+    var cm = line.match(/^@@contract\s+(\w+)/);
+    if (cm){ contract = cm[1]; return; }
     var m = line.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})\s*([\s\S]*)$/);
     if (!m) return;
     var stamp = m[1] + " " + m[2], rest = m[3];
@@ -389,6 +392,7 @@ function parse(text){
     var at = rest.indexOf(pm[0]);
     txs.push({
       stamp:  stamp,
+      contract: contract,
       reason: rest.slice(0, at).trim(),
       user:   rest.slice(at + pm[0].length).trim(),
       change: parseInt(pm[1].replace(/[−–]/g,"-").replace(/\s/g,""), 10)
@@ -417,20 +421,20 @@ function buildPlan(txs, plan){
   plan.splitMembers.forEach(function(name){
     people.set(name, { name:name, spent:0, refunded:0, attended:0, bonus:0 });
   });
-  var slots = new Map(), pool = 0;
+  var slots = new Map(), pool = 0, lent = 0;
 
   txs.forEach(function(tx){
+    if (tx.contract !== plan.contract) return;
     var d = detail(tx.reason);
     if (!tx.user){
-      if (tx.change > 0 && d.id === plan.contract){
+      if (tx.change > 0){
         if (d.kind === "gift" && plan.bonusMember) people.get(plan.bonusMember).bonus += tx.change;
         else pool += tx.change;
       }
       return;
     }
-    if (plan.txMembers.indexOf(tx.user) === -1) return;   // 這個人的紀錄不算在這個方案裡
-
     var per = people.get(tx.user);
+    if (!per){ lent -= tx.change; return; }   // 專用合約被別人用到：算借出，不進任何人的卡片
     if (tx.change < 0) per.spent += -tx.change; else per.refunded += tx.change;
 
     if (d.kind === "book" || d.kind === "cancel" || d.kind === "lateCancel"){
@@ -474,7 +478,10 @@ function buildPlan(txs, plan){
     per.done    = per.attended - per.soon;        // 真的上完的堂數
   });
 
-  var used = list.reduce(function(a,b){ return a + b.used; }, 0);
+  var used = list.reduce(function(a,b){ return a + b.used; }, 0) + lent;
+  if (plan.owner) people.get(plan.owner).left -= lent;
+  if (plan.owner){ var o = people.get(plan.owner); o.classes = Math.floor(o.left / UNIT); o.rest = o.left - o.classes * UNIT; o.lent = lent; }
+  var left = list.reduce(function(a,b){ return a + b.left; }, 0);
   // 總可上堂數＝每個人各自能約的堂數相加。點數是分開算的，
   // 不能把剩餘點數湊成一堆再除（那會多算出一堂沒人約得到的課）。
   var classes = list.reduce(function(a,b){ return a + b.classes; }, 0);
@@ -482,7 +489,7 @@ function buildPlan(txs, plan){
   return {
     key:plan.key, label:plan.label,
     people:list, slots:all, pool:pool, quota:pool / n,
-    used:used, left:pool - used, classes:classes
+    used:used, left:left, classes:classes, lent:lent, owned:!!plan.owner
   };
 }
 
@@ -799,7 +806,8 @@ function renderPlan(plan, idx){
     }
     var tally = '<span>已上 ' + p.done + '</span>' +
                 (p.soon    ? '<span>待上 ' + p.soon + '</span>' : '') +
-                (p.dropped ? '<span>取消 ' + p.dropped + '</span>' : '');
+                (p.dropped ? '<span>取消 ' + p.dropped + '</span>' : '') +
+                (p.lent    ? '<span>借出 ' + p.lent + '</span>' : '');
     return '<article class="card jelly rise" style="--k:var(' + p.bg + ');--kin:var(' + p.in + ');--i:' + (base + 4 + n) + '">' +
       '<div class="card-top"><h3>' + esc(p.name) + '</h3>' +
         '<button class="more" type="button" aria-expanded="false">課程' +
@@ -835,8 +843,8 @@ function renderPlan(plan, idx){
       '</div>' +
       '<div class="people-wrap"><div class="people-wrap-inner"><div class="people">' + cards + '</div></div></div>' +
     '</section>' +
-    '<p class="foot">共買 <b>' + plan.pool + '</b> 點，' + plan.people.length + ' 人平分，每人 <b>' + plan.quota +
-      '</b> 點 · 一堂 <b>' + UNIT + '</b> 點 · 一格＝一堂</p>';
+    '<p class="foot">共買 <b>' + plan.pool + '</b> 點，' + (plan.owned ? '一人專用' : plan.people.length + ' 人平分，每人 <b>' + plan.quota + '</b> 點') +
+      ' · 一堂 <b>' + UNIT + '</b> 點 · 一格＝一堂</p>';
 }
 
 function render(d){
